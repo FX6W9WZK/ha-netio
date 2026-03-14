@@ -30,6 +30,38 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 )
 
 
+async def _test_connection(
+    hass, host: str, port: int, username: str, password: str, use_ssl: bool
+):
+    """Test connection to a NETIO device. Returns (state, error_key)."""
+    scheme = "https" if use_ssl else "http"
+    base_url = f"{scheme}://{host}:{port}"
+
+    session = async_get_clientsession(hass, verify_ssl=False)
+    client = NetioApiClient(
+        base_url=base_url,
+        username=username,
+        password=password,
+        session=session,
+        verify_ssl=not use_ssl,
+    )
+
+    try:
+        state = await client.get_state()
+        return state, None
+    except NetioAuthError:
+        return None, "invalid_auth"
+    except NetioConnectionError as err:
+        _LOGGER.debug("Connection error to %s: %s", base_url, err)
+        return None, "cannot_connect"
+    except NetioApiError as err:
+        _LOGGER.debug("API error from %s: %s", base_url, err)
+        return None, "cannot_connect"
+    except Exception as err:
+        _LOGGER.exception("Unexpected error connecting to %s: %s", base_url, err)
+        return None, "unknown"
+
+
 class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for NETIO devices."""
 
@@ -51,30 +83,23 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
         self._discovered_host = discovery_info.ip
         self._discovered_mac = discovery_info.macaddress
 
-        # Use MAC as unique ID to avoid duplicates
         mac_clean = discovery_info.macaddress.replace(":", "").upper()
         await self.async_set_unique_id(mac_clean)
         self._abort_already_configured(updates={CONF_HOST: discovery_info.ip})
 
         # Try to connect with default credentials to get device info
-        session = async_get_clientsession(self.hass, verify_ssl=False)
-        client = NetioApiClient(
-            base_url=f"http://{discovery_info.ip}",
-            username=DEFAULT_USERNAME,
-            password=DEFAULT_PASSWORD,
-            session=session,
+        state, _ = await _test_connection(
+            self.hass, discovery_info.ip, 80,
+            DEFAULT_USERNAME, DEFAULT_PASSWORD, False,
         )
-        try:
-            state = await client.get_state()
-            self.context["title_placeholders"] = {
-                "name": state.agent.device_name or state.agent.model or "NETIO",
-                "host": discovery_info.ip,
-            }
-        except Exception:
-            self.context["title_placeholders"] = {
-                "name": "NETIO",
-                "host": discovery_info.ip,
-            }
+        name = "NETIO"
+        if state:
+            name = state.agent.device_name or state.agent.model or "NETIO"
+
+        self.context["title_placeholders"] = {
+            "name": name,
+            "host": discovery_info.ip,
+        }
 
         return await self.async_step_dhcp_confirm()
 
@@ -91,24 +116,12 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
             password = user_input[CONF_PASSWORD]
             use_ssl = user_input.get(CONF_USE_SSL, False)
 
-            scheme = "https" if use_ssl else "http"
-            base_url = f"{scheme}://{host}:{port}"
-
-            session = async_get_clientsession(self.hass, verify_ssl=False)
-            client = NetioApiClient(
-                base_url=base_url,
-                username=username,
-                password=password,
-                session=session,
-                verify_ssl=not use_ssl,
+            state, error = await _test_connection(
+                self.hass, host, port, username, password, use_ssl,
             )
 
-            try:
-                state = await client.get_state()
-            except NetioAuthError:
-                errors["base"] = "invalid_auth"
-            except (NetioConnectionError, NetioApiError):
-                errors["base"] = "cannot_connect"
+            if error:
+                errors["base"] = error
             else:
                 serial = (
                     state.agent.serial_number
@@ -164,29 +177,13 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
             password = user_input[CONF_PASSWORD]
             use_ssl = user_input[CONF_USE_SSL]
 
-            scheme = "https" if use_ssl else "http"
-            base_url = f"{scheme}://{host}:{port}"
-
-            # Test connection to the device
-            session = async_get_clientsession(self.hass, verify_ssl=False)
-            client = NetioApiClient(
-                base_url=base_url,
-                username=username,
-                password=password,
-                session=session,
-                verify_ssl=not use_ssl,  # self-signed certs are common on NETIO
+            state, error = await _test_connection(
+                self.hass, host, port, username, password, use_ssl,
             )
 
-            try:
-                state = await client.get_state()
-            except NetioAuthError:
-                errors["base"] = "invalid_auth"
-            except NetioConnectionError:
-                errors["base"] = "cannot_connect"
-            except NetioApiError:
-                errors["base"] = "cannot_connect"
+            if error:
+                errors["base"] = error
             else:
-                # Use serial number as unique ID per JSON API docs
                 serial = (
                     state.agent.serial_number
                     or state.agent.mac.replace(":", "")
