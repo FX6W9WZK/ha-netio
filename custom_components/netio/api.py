@@ -283,7 +283,18 @@ class NetioApiClient:
                     raise NetioApiError(
                         f"HTTP {resp.status}: {text}"
                     )
-                data = await resp.json(content_type=None)
+                try:
+                    data = await resp.json(content_type=None)
+                except (ValueError, Exception) as err:
+                    text = await resp.text()
+                    raise NetioApiError(
+                        f"Invalid JSON response: {err} (body: {text[:200]})"
+                    ) from err
+
+                if not isinstance(data, dict):
+                    raise NetioApiError(
+                        f"Unexpected response type: {type(data).__name__}"
+                    )
                 return _parse_device_state(data)
 
         except aiohttp.ClientError as err:
@@ -364,7 +375,18 @@ class NetioApiClient:
                     text = await resp.text()
                     raise NetioApiError(f"HTTP {resp.status}: {text}")
 
-                data = await resp.json(content_type=None)
+                try:
+                    data = await resp.json(content_type=None)
+                except (ValueError, Exception) as err:
+                    text = await resp.text()
+                    raise NetioApiError(
+                        f"Invalid JSON response: {err} (body: {text[:200]})"
+                    ) from err
+
+                if not isinstance(data, dict):
+                    raise NetioApiError(
+                        f"Unexpected response type: {type(data).__name__}"
+                    )
 
                 # Per documentation, error responses have a "result" key
                 if "result" in data and "error" in data["result"]:
