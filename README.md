@@ -1,6 +1,10 @@
 # NETIO for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![Validate](https://github.com/tuldener/ha-netio/actions/workflows/validate.yaml/badge.svg)](https://github.com/tuldener/ha-netio/actions/workflows/validate.yaml)
+[![GitHub Release](https://img.shields.io/github/v/release/tuldener/ha-netio)](https://github.com/tuldener/ha-netio/releases)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=tuldener&repository=ha-netio&category=integration)
 
 Home Assistant custom integration for [NETIO](https://www.netio-products.com/) networked power sockets and PDUs.
 
