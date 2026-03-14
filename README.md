@@ -94,11 +94,57 @@ Global sensors:
 - Total Energy (Wh)
 - Total Power Factor
 
+### Buttons
+
+Per-output action buttons (per NETIO JSON API specification):
+- **Restart** (Short OFF) — Action 2: Switches output OFF for a defined time, then back ON. Protected during delay.
+- **Short ON** — Action 3: Switches output ON for a defined time, then back OFF.
+- **Toggle** — Action 4: Inverts the current output state.
+
 ### Binary Sensors (devices with digital inputs)
 
 One binary sensor per digital input (e.g. PowerDIN 4PZ).
 
 Plus an S0 pulse counter sensor per input.
+
+## Lovelace Card
+
+The integration includes a custom Lovelace card with glassmorphism design, inspired by [Bubble Card](https://github.com/Clooos/Bubble-Card).
+
+### Installation
+
+Add the card as a Lovelace resource:
+
+**Settings** → **Dashboards** → **Resources** → **Add Resource**
+
+| URL | Type |
+|---|---|
+| `/netio/netio-card.js` | JavaScript Module |
+
+The resource is automatically registered when the integration loads.
+
+### Usage
+
+```yaml
+type: custom:netio-card
+title: NETIO
+show_energy: true
+show_actions: true
+theme: auto
+accent_color: ""
+```
+
+### Card Features
+
+- Auto-discovers all NETIO outlet entities
+- Accordion layout — one output expanded at a time
+- ON/OFF toggle, Restart, Short ON, Toggle buttons
+- Energy metering display (W, mA, Wh, Power Factor)
+- Global device info (Voltage, Frequency, Total Load)
+- Dark / Light mode (automatic or manual)
+- Customizable accent color (default: NETIO green)
+- Visual card editor in Lovelace UI
+- Multilingual (German / English)
 
 ## Protocol Details
 
