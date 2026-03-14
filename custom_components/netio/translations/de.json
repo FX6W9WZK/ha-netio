@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "NETIO-Gerät verbinden",
+        "description": "Gib die Verbindungsdaten deines NETIO-Geräts ein. Die JSON API muss auf dem Gerät aktiviert sein (M2M API Protocols > JSON API).",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "use_ssl": "HTTPS verwenden"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Gerät nicht möglich. Prüfe Host, Port und ob die JSON API aktiviert ist.",
+      "invalid_auth": "Ungültiger Benutzername oder Passwort.",
+      "unknown": "Unerwarteter Fehler."
+    },
+    "abort": {
+      "already_configured": "Dieses Gerät ist bereits konfiguriert."
+    }
+  }
+}
