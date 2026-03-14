@@ -11,6 +11,16 @@
           "password": "Passwort",
           "use_ssl": "HTTPS verwenden"
         }
+      },
+      "dhcp_confirm": {
+        "title": "NETIO-Gerät gefunden",
+        "description": "Ein NETIO-Gerät wurde unter **{host}** gefunden. Gib die Zugangsdaten ein, um die Einrichtung abzuschliessen. Die JSON API muss auf dem Gerät aktiviert sein.",
+        "data": {
+          "port": "Port",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "use_ssl": "HTTPS verwenden"
+        }
       }
     },
     "error": {
