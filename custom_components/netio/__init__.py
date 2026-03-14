@@ -35,12 +35,10 @@ PLATFORMS: list[Platform] = [
     Platform.BUTTON,
 ]
 
-type NetioConfigEntry = ConfigEntry[NetioCoordinator]
-
 _CARD_REGISTERED = False
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: NetioConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up NETIO from a config entry."""
     global _CARD_REGISTERED
     if not _CARD_REGISTERED:
@@ -81,6 +79,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: NetioConfigEntry) -> boo
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: NetioConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a NETIO config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
