@@ -73,6 +73,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    # Force-update configuration_url in device registry (HA caches it)
+    from homeassistant.helpers import device_registry as dr
+    dev_reg = dr.async_get(hass)
+    serial = coordinator.device_serial
+    device = dev_reg.async_get_device(identifiers={(DOMAIN, serial)})
+    if device and device.configuration_url != client.web_url:
+        dev_reg.async_update_device(
+            device.id, configuration_url=client.web_url
+        )
+
     return True
 
 
