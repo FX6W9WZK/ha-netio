@@ -333,6 +333,13 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.8.1 (2025-03-15)
+
+**Fixed**
+- **Device card showed sub-devices instead of parent devices** — When a NETIO device has no parent entry in the device registry (orphan sub-devices with `via_device_id: null`), `nParentDevices` now groups them by serial number prefix from the device identifiers (e.g. `24:A4:2C:39:04:9A_output_1` → serial `24:A4:2C:39:04:9A`).
+- **Unavailable entities no longer shown** — All three cards and their editors now filter out entities with state `unavailable`. This prevents unnamed "Switch" entries from offline devices appearing in the UI.
+- **Entities named just "Switch" show entity_id instead** — The editor dropdowns now display the entity_id when the friendly_name is just "Switch" (no device prefix).
+
 ### v0.8.0 (2025-03-15)
 
 **Added**
