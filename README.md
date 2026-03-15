@@ -344,6 +344,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.9.6 (2025-03-15)
+
+**Added**
+- **Dynamic name sync from NETIO device** — The coordinator now tracks the device hostname and all output socket names from the JSON API. After each poll (every 30s), if a name changed on the NETIO device (e.g. via its web admin), the HA device registry is updated automatically. Only writes to the registry when a name actually differs — no unnecessary updates.
+
 ### v0.9.5 (2025-03-15)
 
 **Changed**
