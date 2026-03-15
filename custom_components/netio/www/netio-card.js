@@ -1,4 +1,4 @@
-const CARD_VERSION = "1.0.0";
+const CARD_VERSION = "1.1.0";
 
 // ─── i18n ───────────────────────────────────────────────────────────
 const _netioLang = () => {
@@ -94,12 +94,51 @@ function nIsDark(theme) {
 }
 
 function nAutoDiscover(hass) {
-  if (!hass) return [];
-  return Object.keys(hass.states)
-    .filter(id => id.startsWith("switch.") && hass.states[id]?.attributes?.device_class === "outlet"
-      && (id.includes("netio") || hass.states[id]?.attributes?.friendly_name?.toLowerCase().includes("netio")
-          || hass.states[id]?.attributes?.friendly_name?.toLowerCase().includes("output")))
+  if (!hass || !hass.entities) return [];
+  // Use entity registry: platform === "netio" is the reliable filter
+  return Object.values(hass.entities)
+    .filter(e => e.platform === "netio" && e.entity_id.startsWith("switch.") && !e.disabled_by && !e.hidden_by)
+    .map(e => e.entity_id)
     .sort();
+}
+
+// Build a device_id lookup: switch entity_id -> device_id
+function nDeviceMap(hass) {
+  if (!hass || !hass.entities) return {};
+  const map = {};
+  Object.values(hass.entities).forEach(e => {
+    if (e.platform === "netio" && e.device_id) {
+      if (!map[e.device_id]) map[e.device_id] = {};
+      const eid = e.entity_id;
+      if (eid.startsWith("switch.")) map[e.device_id].switch = eid;
+      else if (eid.startsWith("button.") && eid.endsWith("_restart")) map[e.device_id].restart = eid;
+      else if (eid.startsWith("button.") && eid.endsWith("_short_on")) map[e.device_id].short_on = eid;
+      else if (eid.startsWith("button.") && eid.endsWith("_toggle")) map[e.device_id].toggle = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_current")) map[e.device_id].current = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_load")) map[e.device_id].load = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_energy") && !eid.endsWith("_reverse_energy")) map[e.device_id].energy = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_power_factor")) map[e.device_id].power_factor = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_voltage")) map[e.device_id].voltage = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_frequency")) map[e.device_id].frequency = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_total_load")) map[e.device_id].total_load = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_total_energy") && !eid.endsWith("_reverse_energy")) map[e.device_id].total_energy = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_total_current")) map[e.device_id].total_current = eid;
+      else if (eid.startsWith("sensor.") && eid.endsWith("_total_power_factor")) map[e.device_id].total_pf = eid;
+    }
+  });
+  return map;
+}
+
+// Build reverse map: switch entity_id -> device_id
+function nSwitchToDevice(hass) {
+  if (!hass || !hass.entities) return {};
+  const map = {};
+  Object.values(hass.entities).forEach(e => {
+    if (e.platform === "netio" && e.entity_id.startsWith("switch.") && e.device_id) {
+      map[e.entity_id] = e.device_id;
+    }
+  });
+  return map;
 }
 
 function nBaseStyles(t) {
@@ -231,6 +270,8 @@ class NetioCard extends HTMLElement {
     this._hass = null;
     this._expanded = {};
     this._rendered = false;
+    this._deviceMap = {};
+    this._switchToDevice = {};
   }
 
   static getConfigElement() { return document.createElement("netio-card-editor"); }
@@ -245,6 +286,8 @@ class NetioCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
+    this._deviceMap = nDeviceMap(hass);
+    this._switchToDevice = nSwitchToDevice(hass);
     if (!this._rendered) { this._render(); return; }
     this._updateExisting();
   }
@@ -267,43 +310,43 @@ class NetioCard extends HTMLElement {
 
   _isOn(o) { return o.entity.state === "on"; }
 
-  _sensorVal(outputName, suffix) {
+  _sensorVal(switchEntityId, sensorKey) {
     if (!this._hass) return null;
-    const prefix = outputName.toLowerCase().replace(/[^a-z0-9]/g, "_");
-    for (const [id, state] of Object.entries(this._hass.states)) {
-      if (id.startsWith("sensor.") && id.includes(prefix) && id.endsWith(suffix)) {
-        const v = parseFloat(state.state);
-        return isNaN(v) ? null : v;
-      }
-    }
-    return null;
+    const devId = this._switchToDevice[switchEntityId];
+    if (!devId || !this._deviceMap[devId]) return null;
+    const sensorEid = this._deviceMap[devId][sensorKey];
+    if (!sensorEid) return null;
+    const state = this._hass.states[sensorEid];
+    if (!state) return null;
+    const v = parseFloat(state.state);
+    return isNaN(v) ? null : v;
   }
 
   _globalSensor(suffix) {
     if (!this._hass) return null;
-    for (const [id, state] of Object.entries(this._hass.states)) {
-      if (id.startsWith("sensor.") && id.includes("netio") && id.endsWith(suffix) && !id.includes("output")) {
-        const v = parseFloat(state.state);
-        return isNaN(v) ? null : v;
+    // Find the parent device (the one without via_device) and its sensors
+    // Global sensors are on the main device, not sub-devices
+    // We look for sensor entities on the netio platform that match the suffix
+    const entities = this._hass.entities;
+    if (!entities) return null;
+    for (const e of Object.values(entities)) {
+      if (e.platform === "netio" && e.entity_id.startsWith("sensor.") && e.entity_id.endsWith("_" + suffix) && !e.disabled_by) {
+        // Check this is a global sensor (device without via_device, or entity without per-output markers)
+        const state = this._hass.states[e.entity_id];
+        if (state) {
+          const v = parseFloat(state.state);
+          if (!isNaN(v)) return v;
+        }
       }
     }
     return null;
   }
 
-  _findButtonEntity(outputEntityId, action) {
+  _findButtonEntity(switchEntityId, action) {
     if (!this._hass) return null;
-    const base = outputEntityId.replace("switch.", "button.").replace(/_output_/, "_output_");
-    const candidates = Object.keys(this._hass.states).filter(id =>
-      id.startsWith("button.") && id.includes(action)
-    );
-    // Match by trying to find the button that shares the same output name segment
-    const switchName = outputEntityId.replace("switch.", "");
-    return candidates.find(id => {
-      const btnName = id.replace("button.", "");
-      // They share a common prefix (the device + output part)
-      const commonParts = switchName.split("_");
-      return commonParts.some(p => p.length > 2 && btnName.includes(p)) && btnName.includes(action);
-    }) || null;
+    const devId = this._switchToDevice[switchEntityId];
+    if (!devId || !this._deviceMap[devId]) return null;
+    return this._deviceMap[devId][action] || null;
   }
 
   _toggleExpand(entityId) {
@@ -392,7 +435,7 @@ class NetioCard extends HTMLElement {
   _renderOutput(o, t) {
     const exp = this._expanded[o.entityId] || false;
     const isOn = this._isOn(o);
-    const load = this._sensorVal(o.name, "load");
+    const load = this._sensorVal(o.entityId, "load");
     const detailParts = [];
     if (isOn && load != null) detailParts.push(`${load} W`);
     if (!isOn) detailParts.push(nT("off"));
@@ -418,10 +461,10 @@ class NetioCard extends HTMLElement {
 
   _renderControls(o, t) {
     const isOn = this._isOn(o);
-    const current = this._sensorVal(o.name, "current");
-    const load = this._sensorVal(o.name, "load");
-    const energy = this._sensorVal(o.name, "energy");
-    const pf = this._sensorVal(o.name, "power_factor");
+    const current = this._sensorVal(o.entityId, "current");
+    const load = this._sensorVal(o.entityId, "load");
+    const energy = this._sensorVal(o.entityId, "energy");
+    const pf = this._sensorVal(o.entityId, "power_factor");
 
     const restartBtn = this._findButtonEntity(o.entityId, "restart");
     const shortOnBtn = this._findButtonEntity(o.entityId, "short_on");
