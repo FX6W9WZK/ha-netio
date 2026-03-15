@@ -18,6 +18,7 @@ import logging
 
 from homeassistant.components.button import ButtonDeviceClass, ButtonEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import NetioApiError
@@ -64,6 +65,7 @@ class NetioRestartButton(NetioOutputEntity, ButtonEntity):
 
     _attr_icon = "mdi:restart"
     _attr_device_class = ButtonDeviceClass.RESTART
+    _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
@@ -98,6 +100,7 @@ class NetioShortOnButton(NetioOutputEntity, ButtonEntity):
     """
 
     _attr_icon = "mdi:timer-outline"
+    _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
@@ -130,6 +133,7 @@ class NetioToggleButton(NetioOutputEntity, ButtonEntity):
     """
 
     _attr_icon = "mdi:toggle-switch-outline"
+    _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
