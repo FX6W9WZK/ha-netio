@@ -1,4 +1,4 @@
-const CARD_VERSION = "2.2.1";
+const CARD_VERSION = "2.2.2";
 const _netioLang = () => { try { return document.querySelector('home-assistant')?.hass?.language || 'en'; } catch(e) { return 'en'; } };
 const _netioI18n = {
   de: {
@@ -99,8 +99,8 @@ Object.assign(NetioCard.prototype,_Lookup);
 
 // ═══ Main Card Editor ═══
 class NetioCardEditor extends HTMLElement{
-  constructor(){super();this.attachShadow({mode:"open"});this._config={};this._hass=null;}
-  set hass(h){this._hass=h;this._render();}
+  constructor(){super();this.attachShadow({mode:"open"});this._config={};this._hass=null;this._hassSet=false;}
+  set hass(h){this._hass=h;if(!this._hassSet){this._hassSet=true;this._render();}}
   setConfig(c){this._config={labels:{},...c};this._render();}
   _getSwitches(){if(!this._hass||!this._hass.entities)return[];return Object.values(this._hass.entities).filter(e=>e.platform==="netio"&&e.entity_id.startsWith("switch.")&&!e.disabled_by).map(e=>({entity_id:e.entity_id,name:this._hass.states[e.entity_id]?.attributes?.friendly_name||e.entity_id})).sort((a,b)=>a.name.localeCompare(b.name));}
   _render(){if(!this.shadowRoot)return;const sw=this._getSwitches(),lb=this._config.labels||{};
@@ -119,25 +119,26 @@ class NetioCardEditor extends HTMLElement{
 
 // ═══ Outlet Card (collapsible) ═══
 class NetioOutletCard extends HTMLElement{
-  constructor(){super();this.attachShadow({mode:"open"});this._config={};this._hass=null;this._expanded=false;this._deviceMap={};this._switchToDevice={};}
+  constructor(){super();this.attachShadow({mode:"open"});this._config={};this._hass=null;this._expanded=false;this._rendered=false;this._deviceMap={};this._switchToDevice={};}
   static getConfigElement(){return document.createElement("netio-outlet-card-editor");}
   static getStubConfig(){return{entity:"",name:"",show_energy:true,theme:"auto",accent_color:""};}
-  setConfig(config){if(!config)throw new Error("Invalid");this._config={entity:"",name:"",show_energy:true,theme:"auto",accent_color:"",...config};this._render();}
-  set hass(h){this._hass=h;this._deviceMap=nDeviceMap(h);this._switchToDevice=nSwitchToDevice(h);this._render();}
-  _toggleExpand(){this._expanded=!this._expanded;this._render();}
+  setConfig(config){if(!config)throw new Error("Invalid");this._config={entity:"",name:"",show_energy:true,theme:"auto",accent_color:"",...config};this._rendered=false;this._render();}
+  set hass(h){this._hass=h;this._deviceMap=nDeviceMap(h);this._switchToDevice=nSwitchToDevice(h);if(!this._rendered){this._render();return;}this._updateOutlet();}
+  _toggleExpand(){this._expanded=!this._expanded;this._rendered=false;this._render();}
   _render(){if(!this.shadowRoot||!this._hass)return;const eid=this._config.entity;const entity=eid?this._hass.states[eid]:null;const t=nThemeVars(nIsDark(this._config.theme),this._config.accent_color||"");
     if(!entity){this.shadowRoot.innerHTML=`<style>${nBaseStyles(t)}</style><div class="n-card"><div class="n-empty">${nSvg('plug',48)}<p>${nT("no_entity")}</p><span>${nT("no_entity_hint")}</span></div></div>`;return;}
     const isOn=entity.state==="on";const displayName=nOutputName(this._config,eid,entity.attributes.friendly_name);const ld=this._sensorVal(eid,"load");const det=[];if(isOn&&ld!=null)det.push(`${ld} W`);if(!isOn)det.push(nT("off"));const exp=this._expanded;const o={entityId:eid,entity,name:displayName};
     this.shadowRoot.innerHTML=`<style>${nBaseStyles(t)}</style><div class="n-card" style="padding:0;"><div class="output-card ${exp?'expanded':''} ${isOn?'':'off'}" style="border-radius:24px;" data-entity="${eid}"><div class="out-main" data-toggle="${eid}"><div class="out-power-bg" style="opacity:${isOn?1:0}"></div><div class="out-content"><div class="out-icon ${isOn?'on':''}">${nSvg(isOn?'plug':'power')}</div><div class="out-info"><span class="out-name">${nEscape(displayName)}</span><span class="out-detail">${det.join(' · ')}</span></div><div class="out-badge ${isOn?'on':'off'}">${isOn?nT("on"):nT("off")}</div><div class="out-chevron ${exp?'rotated':''}">${nSvg('chevron',20)}</div></div></div>${exp?_renderCtrl(this,o,t):''}</div></div>`;
-    const r=this.shadowRoot;r.querySelectorAll("[data-toggle]").forEach(el=>{el.addEventListener("click",e=>{if(e.target.closest("[data-switch]")||e.target.closest("[data-press]"))return;this._toggleExpand();});});_attachEvt(r,this._hass);}
+    this._rendered=true;const r=this.shadowRoot;r.querySelectorAll("[data-toggle]").forEach(el=>{el.addEventListener("click",e=>{if(e.target.closest("[data-switch]")||e.target.closest("[data-press]"))return;this._toggleExpand();});});_attachEvt(r,this._hass);}
+  _updateOutlet(){const r=this.shadowRoot;if(!r)return;const eid=this._config.entity;const entity=eid?this._hass.states[eid]:null;if(!entity){this._rendered=false;this._render();return;}const isOn=entity.state==="on";const card=r.querySelector(".output-card");if(!card){this._rendered=false;this._render();return;}card.classList.toggle("off",!isOn);const ic=card.querySelector(".out-icon");if(ic){ic.classList.toggle("on",isOn);ic.innerHTML=nSvg(isOn?"plug":"power");}const bd=card.querySelector(".out-badge");if(bd){bd.className=`out-badge ${isOn?'on':'off'}`;bd.textContent=isOn?nT("on"):nT("off");}const bg=card.querySelector(".out-power-bg");if(bg)bg.style.opacity=isOn?"1":"0";const det=card.querySelector(".out-detail");if(det){const ld=this._sensorVal(eid,"load");const parts=[];if(isOn&&ld!=null)parts.push(`${ld} W`);if(!isOn)parts.push(nT("off"));det.textContent=parts.join(' · ');}}
   getCardSize(){return this._expanded?3:1;}
 }
 Object.assign(NetioOutletCard.prototype,_Lookup);
 
 // ═══ Outlet Card Editor ═══
 class NetioOutletCardEditor extends HTMLElement{
-  constructor(){super();this.attachShadow({mode:"open"});this._config={};this._hass=null;}
-  set hass(h){this._hass=h;this._render();}
+  constructor(){super();this.attachShadow({mode:"open"});this._config={};this._hass=null;this._hassSet=false;}
+  set hass(h){this._hass=h;if(!this._hassSet){this._hassSet=true;this._render();}}
   setConfig(c){this._config={...c};this._render();}
   _getSwitches(){if(!this._hass||!this._hass.entities)return[];return Object.values(this._hass.entities).filter(e=>e.platform==="netio"&&e.entity_id.startsWith("switch.")&&!e.disabled_by).map(e=>({entity_id:e.entity_id,name:this._hass.states[e.entity_id]?.attributes?.friendly_name||e.entity_id})).sort((a,b)=>a.name.localeCompare(b.name));}
   _render(){if(!this.shadowRoot)return;const sw=this._getSwitches(),cur=this._config.entity||"";
