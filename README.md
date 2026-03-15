@@ -333,6 +333,25 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.8.0 (2025-03-15)
+
+**Added**
+- **New card: `netio-device-card`** — Shows all outlets of a single NETIO master device. Select a device from the dropdown in the editor — the card auto-discovers all child outlets. Includes device model in subtitle, global sensors (voltage, frequency, total load), custom labels and icons per outlet. Ideal when you have multiple NETIO devices and want one card per device.
+
+**Config example**
+```yaml
+type: custom:netio-device-card
+device_id: 244c3aad52b1a5d182b6e2e03b8b385a
+show_energy: true
+```
+
+**Card overview**
+| Card | Description |
+|------|-------------|
+| `netio-card` | All NETIO outlets across all devices |
+| `netio-device-card` | All outlets of one specific NETIO device |
+| `netio-outlet-card` | Single outlet |
+
 ### v0.7.6 (2025-03-15)
 
 **Fixed**
