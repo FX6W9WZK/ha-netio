@@ -333,6 +333,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.7.4 (2025-03-15)
+
+**Fixed**
+- **Switch could not be turned back on after turning off** — The click handler in `_attachEvt` captured the `hass` object at render time. After a state change, HA provides a new `hass` object via `set hass()`, but the old click handler still read the stale state (always saw "on"), so it always called `turn_off`. Now `_attachEvt` receives the card instance and reads `card._hass` at click time, always getting the current state.
+
 ### v0.7.3 (2025-03-15)
 
 **Fixed**
