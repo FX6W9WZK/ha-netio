@@ -344,6 +344,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.9.4 (2025-03-15)
+
+**Fixed**
+- **Multiple NETIO devices crash on startup** — When two or more NETIO integrations were configured, the second entry crashed with `RuntimeError: Added route will never be executed, method GET is already registered`. The static card route `/netio/netio-card.js` only needs to be registered once — the `RuntimeError` from duplicate registration is now caught silently.
+
 ### v0.9.3 (2025-03-15)
 
 **Changed**
