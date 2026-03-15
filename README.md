@@ -333,6 +333,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.6.3 (2025-03-15)
+
+**Fixed**
+- **Card editor crash: "Cannot read properties of null (reading 'addEventListener')"** — The sed-based refactoring in v0.5.2/v0.6.0 accidentally removed the `innerHTML` template from both card editors. The editors tried to bind event listeners to non-existent DOM elements. Restored complete editor HTML templates.
+
 ### v0.6.2 (2025-03-15)
 
 **Added**
