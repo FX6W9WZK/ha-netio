@@ -333,6 +333,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.6.6 (2025-03-15)
+
+**Fixed**
+- **"tg is not defined" error in cards** — The toggle switch refactoring left a variable name mismatch in `_updateExisting` and `_updateOutlet` (`const bd=...` but referenced as `tg`). Both now correctly use `tg`.
+
 ### v0.6.5 (2025-03-15)
 
 **Changed**
