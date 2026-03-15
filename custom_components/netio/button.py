@@ -9,6 +9,7 @@ Per NETIO JSON API documentation, outputs support these actions:
   5 = No change       → not useful
 
 This module creates buttons for actions 2, 3, and 4.
+Each button is registered under the outlet's sub-device.
 """
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ from .api import NetioApiError
 from .const import ACTION_SHORT_OFF, ACTION_SHORT_ON, ACTION_TOGGLE
 from homeassistant.config_entries import ConfigEntry
 from .coordinator import NetioCoordinator
-from .entity import NetioEntity
+from .entity import NetioOutputEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class NetioRestartButton(NetioEntity, ButtonEntity):
+class NetioRestartButton(NetioOutputEntity, ButtonEntity):
     """Button to restart (short OFF) a NETIO output.
 
     Per documentation: Action 2 = Short OFF delay (restart).
@@ -65,23 +66,12 @@ class NetioRestartButton(NetioEntity, ButtonEntity):
     _attr_device_class = ButtonDeviceClass.RESTART
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
-        super().__init__(coordinator)
-        self._output_id = output_id
+        super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_restart"
 
     @property
-    def _output(self):
-        if self.coordinator.data:
-            for output in self.coordinator.data.outputs:
-                if output.id == self._output_id:
-                    return output
-        return None
-
-    @property
     def name(self) -> str | None:
-        output = self._output
-        output_name = output.name if output else f"Output {self._output_id}"
-        return f"{output_name} Restart"
+        return "Restart"
 
     async def async_press(self) -> None:
         """Execute short OFF (restart) on the output."""
@@ -96,7 +86,7 @@ class NetioRestartButton(NetioEntity, ButtonEntity):
             )
 
 
-class NetioShortOnButton(NetioEntity, ButtonEntity):
+class NetioShortOnButton(NetioOutputEntity, ButtonEntity):
     """Button to short ON a NETIO output.
 
     Per documentation: Action 3 = Short ON delay.
@@ -107,23 +97,12 @@ class NetioShortOnButton(NetioEntity, ButtonEntity):
     _attr_icon = "mdi:timer-outline"
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
-        super().__init__(coordinator)
-        self._output_id = output_id
+        super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_short_on"
 
     @property
-    def _output(self):
-        if self.coordinator.data:
-            for output in self.coordinator.data.outputs:
-                if output.id == self._output_id:
-                    return output
-        return None
-
-    @property
     def name(self) -> str | None:
-        output = self._output
-        output_name = output.name if output else f"Output {self._output_id}"
-        return f"{output_name} Short ON"
+        return "Short ON"
 
     async def async_press(self) -> None:
         """Execute short ON on the output."""
@@ -138,7 +117,7 @@ class NetioShortOnButton(NetioEntity, ButtonEntity):
             )
 
 
-class NetioToggleButton(NetioEntity, ButtonEntity):
+class NetioToggleButton(NetioOutputEntity, ButtonEntity):
     """Button to toggle a NETIO output.
 
     Per documentation: Action 4 = Toggle (invert the state).
@@ -147,23 +126,12 @@ class NetioToggleButton(NetioEntity, ButtonEntity):
     _attr_icon = "mdi:toggle-switch-outline"
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
-        super().__init__(coordinator)
-        self._output_id = output_id
+        super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_toggle"
 
     @property
-    def _output(self):
-        if self.coordinator.data:
-            for output in self.coordinator.data.outputs:
-                if output.id == self._output_id:
-                    return output
-        return None
-
-    @property
     def name(self) -> str | None:
-        output = self._output
-        output_name = output.name if output else f"Output {self._output_id}"
-        return f"{output_name} Toggle"
+        return "Toggle"
 
     async def async_press(self) -> None:
         """Toggle the output."""
