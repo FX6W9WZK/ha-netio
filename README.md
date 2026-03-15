@@ -333,6 +333,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.7.6 (2025-03-15)
+
+**Fixed**
+- **Device "Besuchen" link now updates on reload** — HA caches the `configuration_url` in the device registry and does not update it from `DeviceInfo` on subsequent loads. The integration now explicitly updates the device registry entry after platform setup, forcing the URL to the correct value (without API port).
+
 ### v0.7.5 (2025-03-15)
 
 **Fixed**
