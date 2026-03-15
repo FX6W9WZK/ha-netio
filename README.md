@@ -333,6 +333,26 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.7.0 (2025-03-15)
+
+**Added**
+- **Custom icons per output** — Both cards support custom MDI icons (e.g. `mdi:television`, `mdi:server`, `mdi:lamp`). In the combined card, each output has its own icon field next to the label. In the outlet card, a single icon field in the editor.
+- **NETIO logo in card header** — The plug icon next to the title is replaced by the NETIO wordmark logo.
+
+**Config example**
+```yaml
+# Combined card with custom icons
+type: custom:netio-card
+icons:
+  switch.stjane01_kabine01: mdi:television
+  switch.stjane01_kabine02: mdi:server-network
+
+# Outlet card with custom icon
+type: custom:netio-outlet-card
+entity: switch.stjane01_kabine01
+icon: mdi:television
+```
+
 ### v0.6.6 (2025-03-15)
 
 **Fixed**
