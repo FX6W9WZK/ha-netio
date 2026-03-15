@@ -344,6 +344,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.9.2 (2025-03-15)
+
+**Changed**
+- **Static preview in card picker** — When adding a new card via the dashboard picker, the Device and Outlet cards now show a realistic mock layout (with sample outlets, toggle switches, and the NETIO header) instead of the "Kein Gerät/Ausgang ausgewählt" empty state. This makes it easy to see what the card looks like before configuring it.
+
 ### v0.9.1 (2025-03-15)
 
 **Changed**
