@@ -33,7 +33,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from homeassistant.config_entries import ConfigEntry
 from .coordinator import NetioCoordinator
-from .entity import NetioEntity
+from .entity import NetioEntity, NetioOutputEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -194,8 +194,12 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class NetioOutputSensor(NetioEntity, SensorEntity):
-    """Sensor for a single NETIO output measurement."""
+class NetioOutputSensor(NetioOutputEntity, SensorEntity):
+    """Sensor for a single NETIO output measurement.
+
+    Inherits from NetioOutputEntity to register under the outlet's
+    sub-device.
+    """
 
     entity_description: NetioOutputSensorDescription
 
@@ -206,9 +210,8 @@ class NetioOutputSensor(NetioEntity, SensorEntity):
         description: NetioOutputSensorDescription,
     ) -> None:
         """Initialize the output sensor."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, output_id)
         self.entity_description = description
-        self._output_id = output_id
         self._attr_unique_id = (
             f"{coordinator.device_serial}_output_{output_id}_{description.key}"
         )
@@ -224,10 +227,12 @@ class NetioOutputSensor(NetioEntity, SensorEntity):
 
     @property
     def name(self) -> str | None:
-        """Return the sensor name including the output name."""
-        output = self._output
-        output_name = output.name if output else f"Output {self._output_id}"
-        return f"{output_name} {self.entity_description.key}"
+        """Return the sensor name.
+
+        Since the outlet name is already in the sub-device name,
+        we only return the measurement type here.
+        """
+        return self.entity_description.key.replace("_", " ").title()
 
     @property
     def native_value(self):
