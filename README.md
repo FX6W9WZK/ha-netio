@@ -333,6 +333,12 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.8.2 (2025-03-15)
+
+**Fixed**
+- **Parent device always created** — The parent device is now explicitly registered in the device registry (via `dev_reg.async_get_or_create()`) BEFORE platform entities are set up. This ensures that sub-device outlets always have a valid `via_device_id` pointing to their parent, even if the parent has no dedicated entities (global sensors).
+- **Device card default title is now "NETIO"** — Previously defaulted to the HA device name (e.g. "stjane02 Kabine05").
+
 ### v0.8.1 (2025-03-15)
 
 **Fixed**
