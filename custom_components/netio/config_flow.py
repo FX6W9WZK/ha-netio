@@ -80,6 +80,65 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
         """Get the options flow handler."""
         return NetioOptionsFlow(config_entry)
 
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle reconfiguration of connection settings."""
+        errors: dict[str, str] = {}
+        entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
+
+        if user_input is not None:
+            host = user_input[CONF_HOST]
+            port = user_input[CONF_PORT]
+            username = user_input[CONF_USERNAME]
+            password = user_input[CONF_PASSWORD]
+            use_ssl = user_input[CONF_USE_SSL]
+
+            state, error = await _test_connection(
+                self.hass, host, port, username, password, use_ssl,
+            )
+
+            if error:
+                errors["base"] = error
+            else:
+                return self.async_update_reload_and_abort(
+                    entry,
+                    data={
+                        CONF_HOST: host,
+                        CONF_PORT: port,
+                        CONF_USERNAME: username,
+                        CONF_PASSWORD: password,
+                        CONF_USE_SSL: use_ssl,
+                    },
+                )
+
+        # Pre-fill with current values
+        current = entry.data
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_HOST, default=current.get(CONF_HOST, "")): str,
+                vol.Optional(CONF_PORT, default=current.get(CONF_PORT, 80)): int,
+                vol.Optional(
+                    CONF_USERNAME,
+                    default=current.get(CONF_USERNAME, DEFAULT_USERNAME),
+                ): str,
+                vol.Optional(
+                    CONF_PASSWORD,
+                    default=current.get(CONF_PASSWORD, DEFAULT_PASSWORD),
+                ): str,
+                vol.Optional(
+                    CONF_USE_SSL,
+                    default=current.get(CONF_USE_SSL, False),
+                ): bool,
+            }
+        )
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=schema,
+            errors=errors,
+        )
+
     async def async_step_dhcp(
         self, discovery_info: DhcpServiceInfo
     ) -> ConfigFlowResult:
