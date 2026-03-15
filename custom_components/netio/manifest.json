@@ -5,7 +5,7 @@
     "http"
   ],
   "codeowners": [
-    "@tuldener"
+    "@FX6W9WZK"
   ],
   "config_flow": true,
   "dhcp": [
@@ -13,8 +13,8 @@
       "macaddress": "24A42C*"
     }
   ],
-  "documentation": "https://github.com/tuldener/ha-netio",
+  "documentation": "https://github.com/FX6W9WZK/ha-netio",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/tuldener/ha-netio/issues",
-  "version": "0.9.8"
+  "issue_tracker": "https://github.com/FX6W9WZK/ha-netio/issues",
+  "version": "0.9.9"
 }
