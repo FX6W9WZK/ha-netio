@@ -21,7 +21,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import NetioApiError
-from .const import ACTION_SHORT_OFF, ACTION_SHORT_ON, ACTION_TOGGLE
+from .const import ACTION_SHORT_OFF, ACTION_SHORT_ON, ACTION_TOGGLE, CONF_ENABLE_RESTART, CONF_ENABLE_SHORT_ON, CONF_ENABLE_TOGGLE
 from homeassistant.config_entries import ConfigEntry
 from .coordinator import NetioCoordinator
 from .entity import NetioOutputEntity
@@ -68,6 +68,9 @@ class NetioRestartButton(NetioOutputEntity, ButtonEntity):
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_restart"
+        self._attr_entity_registry_enabled_default = (
+            coordinator.config_entry.options.get(CONF_ENABLE_RESTART, True)
+        )
 
     @property
     def name(self) -> str | None:
@@ -99,6 +102,9 @@ class NetioShortOnButton(NetioOutputEntity, ButtonEntity):
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_short_on"
+        self._attr_entity_registry_enabled_default = (
+            coordinator.config_entry.options.get(CONF_ENABLE_SHORT_ON, True)
+        )
 
     @property
     def name(self) -> str | None:
@@ -128,6 +134,9 @@ class NetioToggleButton(NetioOutputEntity, ButtonEntity):
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_toggle"
+        self._attr_entity_registry_enabled_default = (
+            coordinator.config_entry.options.get(CONF_ENABLE_TOGGLE, True)
+        )
 
     @property
     def name(self) -> str | None:
