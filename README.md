@@ -333,6 +333,43 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.6.1 (2025-03-15)
+
+**Added**
+- **Reconfigure connection settings** — Host, Port, Username, Password and HTTPS can now be changed after initial setup via ⋮ Menu → "Reconfigure" on the integration page.
+
+### v0.6.0 (2025-03-15)
+
+**Added**
+- **Options flow for button entity visibility** — Under Settings → Devices → NETIO device → "Configure", three toggles control which button entities are enabled (Restart, Short ON, Toggle). Disabled entities disappear from `hass.states` and are automatically hidden in Lovelace cards.
+
+**Changed**
+- Button visibility checkboxes removed from Lovelace card editors — now controlled centrally at device level.
+
+### v0.5.2 (2025-03-15)
+
+**Fixed**
+- **Dashboard refresh loop** — Removed `ll-rebuild` event dispatch that forced Lovelace to rebuild on every card load, interrupting user interaction.
+
+### v0.5.1 (2025-03-15)
+
+**Added**
+- **Editable output labels** — Both cards support custom names for outputs. Combined card: per-output labels in editor. Outlet card: single name field in editor.
+
+**Changed**
+- Outlet card is now collapsible (same accordion pattern as combined card). Click to expand/collapse details.
+
+### v0.5.0 (2025-03-15)
+
+**Added**
+- **New `netio-outlet-card`** — Single-outlet Lovelace card with outlet dropdown, ON/OFF toggle, action buttons, energy metering, and visual card editor.
+- **Individual button configuration** — Separate checkboxes for Restart, Short ON, Toggle buttons (replaced single "Show action buttons" toggle).
+
+### v0.4.2 (2025-03-15)
+
+**Fixed**
+- **Lovelace card entity discovery** — Card used string matching (`id.includes("netio")`) which failed when entity IDs are based on device name. Now uses `hass.entities` with `platform === "netio"` and groups entities by `device_id`.
+
 ### v0.4.1 (2025-03-15)
 
 **Fixed**
