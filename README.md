@@ -333,6 +333,14 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.6.4 (2025-03-15)
+
+**Fixed**
+- **Cards and editors constantly re-rendering** — `set hass()` triggered a full `innerHTML` rebuild on every HA state update (every few seconds), making text editing in the card editor impossible. Now:
+  - Main card: incremental DOM updates via `_updateExisting()` (already existed)
+  - Outlet card: new `_updateOutlet()` for incremental updates, full render only on first load or config change
+  - Both editors: render only once when `hass` is first provided, not on every update
+
 ### v0.6.3 (2025-03-15)
 
 **Fixed**
