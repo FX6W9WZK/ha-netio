@@ -11,6 +11,8 @@ Home Assistant custom integration for [NETIO](https://www.netio-products.com/) n
 
 Uses the **NETIO JSON over HTTP(s) M2M API** (Protocol Version 2.4) to read device status and control power outputs.
 
+![NETIO Device Card](docs/card-preview.png)
+
 ## Supported Devices
 
 ### Current Products
@@ -113,8 +115,6 @@ Plus an S0 pulse counter sensor per input.
 ## Lovelace Cards
 
 The integration includes three custom Lovelace cards with glassmorphism design, inspired by [Bubble Card](https://github.com/Clooos/Bubble-Card).
-
-![NETIO Device Card](docs/card-preview.png)
 
 | Card | Description |
 |------|-------------|
