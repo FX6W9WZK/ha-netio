@@ -333,6 +333,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.7.5 (2025-03-15)
+
+**Fixed**
+- **Device info link no longer includes API port** — The configuration URL in the device info page now points to `http(s)://host` (web admin) instead of `http(s)://host:port` (API endpoint).
+
 ### v0.7.4 (2025-03-15)
 
 **Fixed**
