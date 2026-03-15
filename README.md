@@ -341,6 +341,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.8.4 (2025-03-15)
+
+**Changed**
+- **README updated** — Card preview screenshot added, Lovelace section rewritten with three-card overview table.
+
 ### v0.8.3 (2025-03-15)
 
 **Changed**
