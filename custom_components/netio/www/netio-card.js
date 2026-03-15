@@ -1,4 +1,4 @@
-const CARD_VERSION = "2.5.0";
+const CARD_VERSION = "2.5.1";
 const _netioLang = () => { try { return document.querySelector('home-assistant')?.hass?.language || 'en'; } catch(e) { return 'en'; } };
 const _netioI18n = {
   de: {
@@ -50,7 +50,7 @@ const N_ICONS={
   bolt:'<path d="M11 21h-1l1-7H7.5c-.88 0-.33-.75-.31-.78C8.48 10.94 10.42 7.54 13.01 3h1l-1 7h3.51c.4 0 .62.19.4.66C12.97 17.55 11 21 11 21z"/>',
   chevron:'<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>',
 };
-function nNetioLogo(s=28){return `<svg viewBox="0 0 120 30" width="${s*3}" height="${s}" fill="white"><text x="2" y="24" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="28" letter-spacing="2">NETIO</text></svg>`;}
+function nNetioLogo(){return `<svg viewBox="0 0 100 24" width="32" height="10" fill="white"><text x="50" y="12" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="22" letter-spacing="1.5" text-anchor="middle" dominant-baseline="central">NETIO</text></svg>`;}
 function nSvg(i,s=22){return`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="currentColor">${N_ICONS[i]}</svg>`;}
 function nThemeVars(isDark,accentHex){const a=accentHex||"#006B3F",r=nHexToRgb(a);return{bg:isDark?"rgba(30,33,40,0.95)":"rgba(255,255,255,0.95)",cardBg:isDark?"rgba(40,44,52,0.8)":"rgba(245,247,250,0.8)",cardBgHover:isDark?"rgba(50,55,65,0.9)":"rgba(235,238,245,0.9)",text:isDark?"#e4e6eb":"#1a1c20",textSec:isDark?"rgba(228,230,235,0.6)":"rgba(26,28,32,0.5)",accent:a,accentLight:isDark?`rgba(${r},0.15)`:`rgba(${r},0.1)`,accentMid:isDark?`rgba(${r},0.25)`:`rgba(${r},0.18)`,border:isDark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",onColor:"#4caf50",offColor:isDark?"rgba(255,255,255,0.3)":"rgba(0,0,0,0.25)",isDark,volBgStart:isDark?`rgba(${r},0.38)`:`rgba(${r},0.26)`,volBgMid:isDark?`rgba(${r},0.14)`:`rgba(${r},0.09)`};}
 function nIsDark(t){return t==="dark"||(t==="auto"&&window.matchMedia("(prefers-color-scheme: dark)").matches);}
