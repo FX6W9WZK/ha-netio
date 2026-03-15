@@ -85,7 +85,7 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
 
         mac_clean = discovery_info.macaddress.replace(":", "").upper()
         await self.async_set_unique_id(mac_clean)
-        self._abort_already_configured(updates={CONF_HOST: discovery_info.ip})
+        self._abort_if_unique_id_configured(updates={CONF_HOST: discovery_info.ip})
 
         # Try to connect with default credentials to get device info
         state, _ = await _test_connection(
@@ -129,7 +129,7 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
                     or self._discovered_mac.replace(":", "").upper()
                 )
                 await self.async_set_unique_id(serial)
-                self._abort_already_configured()
+                self._abort_if_unique_id_configured()
 
                 title = (
                     state.agent.device_name
@@ -190,7 +190,7 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
                     or f"{host}_{port}"
                 )
                 await self.async_set_unique_id(serial)
-                self._abort_already_configured()
+                self._abort_if_unique_id_configured()
 
                 title = (
                     state.agent.device_name
