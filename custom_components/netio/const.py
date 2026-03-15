@@ -27,6 +27,11 @@ ACTION_IGNORED = 6
 STATE_OUTPUT_OFF = 0
 STATE_OUTPUT_ON = 1
 
+# Options flow: enable/disable button entity types
+CONF_ENABLE_RESTART = "enable_restart"
+CONF_ENABLE_SHORT_ON = "enable_short_on"
+CONF_ENABLE_TOGGLE = "enable_toggle"
+
 # Supported device models from NETIO documentation
 # Current products (from netio-products.com/en/products/all-products)
 # Obsolete products (from netio-products.com/en/products/obsolete-products)
