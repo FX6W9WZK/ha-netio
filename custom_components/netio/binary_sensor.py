@@ -16,7 +16,8 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .coordinator import NetioConfigEntry, NetioCoordinator
+from homeassistant.config_entries import ConfigEntry
+from .coordinator import NetioCoordinator
 from .entity import NetioEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: NetioConfigEntry,
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up NETIO binary sensors from a config entry."""
