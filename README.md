@@ -333,6 +333,14 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 
 ## Changelog
 
+### v0.7.1 (2025-03-15)
+
+**Fixed**
+- **Labels could not be edited/saved in combined card** — `setConfig()` was called by HA after every `config-changed` event, triggering a full DOM re-render that destroyed the editor form. Added `_didRender` guard to both editors.
+
+**Changed**
+- **Icon picker with search and preview** — Replaced the MDI text input with HA's native `<ha-icon-picker>` element. Click the icon field to open a searchable dropdown with visual icon previews. Works in both card editors.
+
 ### v0.7.0 (2025-03-15)
 
 **Added**
