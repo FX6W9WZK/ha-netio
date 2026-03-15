@@ -32,6 +32,15 @@
           "password": "Passwort",
           "use_ssl": "HTTPS verwenden"
         }
+      },
+      "buttons": {
+        "title": "Button-Entitäten",
+        "description": "Wähle welche Aktions-Buttons für alle Ausgänge aktiviert werden. Dies kann später unter Konfigurieren geändert werden.",
+        "data": {
+          "enable_restart": "Neustart-Button (Short OFF)",
+          "enable_short_on": "Kurz-Ein-Button",
+          "enable_toggle": "Umschalten-Button"
+        }
       }
     },
     "error": {
