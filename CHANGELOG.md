@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+### v1.1.0 (2026-03-16)
+
+#### Changed
+- **NETIO card: selectable outputs** — The main NETIO card now has an entity picker in the editor. Check/uncheck which outputs to display. "Show all" (default) displays every NETIO output. Unchecking specific outputs allows creating multiple cards with different subsets.
+- Labels and icons are only shown for selected outputs in the editor.
+- Card version bumped to 4.1.0
+
 ### v1.0.0 (2025-03-15)
 
 **First stable release.**
