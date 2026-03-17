@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here.
 
+### v1.2.0 (2026-03-17)
+
+#### Changed
+- **Bubble Card aligned sizing** — All card dimensions now match typical Bubble Card / HA tile proportions:
+  - Output rows: ~56px height (was ~68px), matching HA `--row-height`
+  - Icons: 36×36px circular (was 40×40px rounded square)
+  - Icon size: 20px (was 22px)
+  - Toggle switch: 40×22px (was 44×24px)
+  - Card border-radius: 25px (was 24px), output cards: 25px (was 18px)
+  - Card padding: 16px (was 20px)
+  - Action buttons: pill-shaped (border-radius 20px), smaller font (11px)
+  - Energy chips: more compact grid (80px min vs 90px)
+  - Header icon: 38px circular (was 42px rounded square)
+  - Title font: 14px (was 16px)
+  - Chevron: 18px (was 20px)
+- Card version bumped to 4.2.0
+
 ### v1.1.0 (2026-03-16)
 
 #### Changed
