@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here.
 
+### v1.3.0 (2026-03-17)
+
+#### Breaking
+- **Domain renamed: `netio` → `netio_products`** — The old `netio` domain collides with a built-in HA Core integration (Telnet-based, from 2015). The new domain `netio_products` passes hassfest validation and is required for HACS default registration.
+  - **Migration:** Remove the old NETIO integration, restart HA, then re-add it. Entity IDs will change (e.g. `switch.netio_products_...`).
+  - The `custom_components` folder changes from `netio/` to `netio_products/`.
+
+#### Fixed
+- **Hassfest: lovelace dependency** — Removed direct import of `homeassistant.components.lovelace`; now accesses `hass.data["lovelace"]` dynamically. No longer needs lovelace in manifest dependencies.
+- **Hassfest: domain collision** — Resolved by renaming domain to `netio_products`.
+- **GitHub Actions: Node.js 24** — Added `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` to suppress Node.js 20 deprecation warnings.
+
 ### v1.2.4 (2026-03-17)
 
 #### Fixed
