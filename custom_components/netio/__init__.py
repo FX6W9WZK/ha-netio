@@ -24,31 +24,96 @@ PLATFORMS: list[Platform] = [
 ]
 
 _CARD_REGISTERED = False
+_CARD_URL_BASE = "/netio/netio-card.js"
+
+
+async def _register_card(hass: HomeAssistant) -> None:
+    """Register the Lovelace card static path and resource."""
+    global _CARD_REGISTERED
+    if _CARD_REGISTERED:
+        return
+
+    card_path = Path(__file__).parent / "www" / "netio-card.js"
+    if not card_path.exists():
+        _CARD_REGISTERED = True
+        return
+
+    # Read version from JS file first line: const CARD_VERSION = "x.y.z";
+    version = "0"
+    try:
+        first_line = card_path.read_text(encoding="utf-8").split("\n", 1)[0]
+        if "CARD_VERSION" in first_line:
+            version = first_line.split('"')[1]
+    except (IndexError, OSError):
+        pass
+
+    card_url = f"{_CARD_URL_BASE}?v={version}"
+
+    # 1. Register static path
+    try:
+        from homeassistant.components.http import StaticPathConfig
+        await hass.http.async_register_static_paths(
+            [StaticPathConfig(_CARD_URL_BASE, str(card_path), False)]
+        )
+    except (ImportError, AttributeError):
+        try:
+            hass.http.register_static_path(
+                _CARD_URL_BASE, str(card_path), cache_headers=False
+            )
+        except (AttributeError, RuntimeError):
+            pass
+    except RuntimeError:
+        pass
+
+    # 2. Auto-register/update Lovelace resource
+    try:
+        from homeassistant.components.lovelace import DOMAIN as LL_DOMAIN
+        from homeassistant.components.lovelace.resources import (
+            ResourceStorageCollection,
+        )
+
+        ll_data = hass.data.get(LL_DOMAIN)
+        if ll_data and hasattr(ll_data, "resources"):
+            resources: ResourceStorageCollection = ll_data.resources
+            if resources.loaded:
+                # Find existing NETIO resource
+                existing = None
+                for item in resources.async_items():
+                    if _CARD_URL_BASE in item.get("url", ""):
+                        existing = item
+                        break
+
+                if existing:
+                    # Update URL with new version if changed
+                    if existing["url"] != card_url:
+                        await resources.async_update_item(
+                            existing["id"], {"url": card_url}
+                        )
+                        _LOGGER.debug(
+                            "Updated NETIO card resource: %s", card_url
+                        )
+                else:
+                    # Create new resource
+                    await resources.async_create_item(
+                        {"res_type": "module", "url": card_url}
+                    )
+                    _LOGGER.info(
+                        "Registered NETIO card resource: %s", card_url
+                    )
+    except Exception:  # noqa: BLE001
+        # Lovelace resources not available (e.g. YAML mode) — user manages manually
+        _LOGGER.debug(
+            "Could not auto-register Lovelace resource. "
+            "Add manually: %s",
+            card_url,
+        )
+
+    _CARD_REGISTERED = True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up NETIO from a config entry."""
-    global _CARD_REGISTERED
-    if not _CARD_REGISTERED:
-        card_path = Path(__file__).parent / "www" / "netio-card.js"
-        if card_path.exists():
-            try:
-                # HA 2025.x+
-                from homeassistant.components.http import StaticPathConfig
-                await hass.http.async_register_static_paths(
-                    [StaticPathConfig("/netio/netio-card.js", str(card_path), False)]
-                )
-            except (ImportError, AttributeError):
-                try:
-                    # Older HA
-                    hass.http.register_static_path(
-                        "/netio/netio-card.js", str(card_path), cache_headers=False
-                    )
-                except (AttributeError, RuntimeError):
-                    pass  # Route already registered
-            except RuntimeError:
-                pass  # Route already registered by another config entry
-        _CARD_REGISTERED = True
+    await _register_card(hass)
 
     host = entry.data[CONF_HOST]
     port = entry.data[CONF_PORT]
