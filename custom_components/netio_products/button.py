@@ -70,7 +70,7 @@ class NetioRestartButton(NetioOutputEntity, ButtonEntity):
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_restart"
-        self._attr_entity_registry_enabled_default = (
+        self._attr_entity_registry_visible_default = (
             coordinator.config_entry.options.get(CONF_ENABLE_RESTART, True)
         )
 
@@ -105,7 +105,7 @@ class NetioShortOnButton(NetioOutputEntity, ButtonEntity):
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_short_on"
-        self._attr_entity_registry_enabled_default = (
+        self._attr_entity_registry_visible_default = (
             coordinator.config_entry.options.get(CONF_ENABLE_SHORT_ON, True)
         )
 
@@ -138,7 +138,7 @@ class NetioToggleButton(NetioOutputEntity, ButtonEntity):
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
         self._attr_unique_id = f"{coordinator.device_serial}_output_{output_id}_toggle"
-        self._attr_entity_registry_enabled_default = (
+        self._attr_entity_registry_visible_default = (
             coordinator.config_entry.options.get(CONF_ENABLE_TOGGLE, True)
         )
 
