@@ -166,7 +166,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     for ent in er.async_entries_for_config_entry(ent_reg, entry.entry_id):
         if not ent.entity_id.startswith("button."):
             continue
-        if ent.disabled_by == er.RegistryEntryDisabler.INTEGRATION:
+        if ent.disabled_by in (
+            er.RegistryEntryDisabler.INTEGRATION,
+            er.RegistryEntryDisabler.DEVICE,
+        ):
             # Clear disabled_by, ensure hidden_by is set
             ent_reg.async_update_entity(
                 ent.entity_id,
