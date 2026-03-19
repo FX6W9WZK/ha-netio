@@ -332,7 +332,7 @@ class NetioOptionsFlow(OptionsFlow):
                 CONF_ENABLE_TOGGLE: user_input[CONF_ENABLE_TOGGLE],
             }
 
-            # Enable/disable button entities in the entity registry
+            # Show/hide button entities in the entity registry
             from homeassistant.helpers import entity_registry as er
 
             ent_reg = er.async_get(self.hass)
@@ -344,22 +344,22 @@ class NetioOptionsFlow(OptionsFlow):
                 if not entry.entity_id.startswith("button."):
                     continue
 
-                should_disable = False
+                should_hide = False
                 if entry.entity_id.endswith("_restart"):
-                    should_disable = not new_options[CONF_ENABLE_RESTART]
+                    should_hide = not new_options[CONF_ENABLE_RESTART]
                 elif entry.entity_id.endswith("_short_on"):
-                    should_disable = not new_options[CONF_ENABLE_SHORT_ON]
+                    should_hide = not new_options[CONF_ENABLE_SHORT_ON]
                 elif entry.entity_id.endswith("_toggle"):
-                    should_disable = not new_options[CONF_ENABLE_TOGGLE]
+                    should_hide = not new_options[CONF_ENABLE_TOGGLE]
 
-                if should_disable and entry.disabled_by is None:
+                if should_hide and entry.hidden_by is None:
                     ent_reg.async_update_entity(
                         entry.entity_id,
-                        disabled_by=er.RegistryEntryDisabler.INTEGRATION,
+                        hidden_by=er.RegistryEntryHider.INTEGRATION,
                     )
-                elif not should_disable and entry.disabled_by is not None:
+                elif not should_hide and entry.hidden_by == er.RegistryEntryHider.INTEGRATION:
                     ent_reg.async_update_entity(
-                        entry.entity_id, disabled_by=None
+                        entry.entity_id, hidden_by=None
                     )
 
             return self.async_create_entry(title="", data=new_options)
