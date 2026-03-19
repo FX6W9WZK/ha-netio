@@ -34,12 +34,12 @@
         }
       },
       "buttons": {
-        "title": "Button Entities",
-        "description": "Choose which action buttons to enable for all outputs. You can change this later under Configure.",
+        "title": "NETIO Entities",
+        "description": "Choose which entities should be visible. You can change this anytime in the configuration.",
         "data": {
-          "enable_restart": "Restart button (Short OFF)",
-          "enable_short_on": "Short ON button",
-          "enable_toggle": "Toggle button"
+          "enable_restart": "Restart (Short OFF)",
+          "enable_short_on": "Short ON",
+          "enable_toggle": "Toggle"
         }
       }
     },
@@ -55,12 +55,12 @@
   "options": {
     "step": {
       "init": {
-        "title": "NETIO Button Entities",
-        "description": "Choose which action buttons are enabled for all outputs of this device. Disabled buttons will not appear in Lovelace cards.",
+        "title": "NETIO Entities",
+        "description": "Choose which entities should be visible. You can change this anytime in the configuration.",
         "data": {
-          "enable_restart": "Restart button (Short OFF)",
-          "enable_short_on": "Short ON button",
-          "enable_toggle": "Toggle button"
+          "enable_restart": "Restart (Short OFF)",
+          "enable_short_on": "Short ON",
+          "enable_toggle": "Toggle"
         }
       }
     }
