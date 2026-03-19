@@ -43,7 +43,10 @@ async def _register_card(hass: HomeAssistant) -> None:
     try:
         import json as _json
         manifest = Path(__file__).parent / "manifest.json"
-        version = _json.loads(manifest.read_text(encoding="utf-8")).get("version", "0")
+        manifest_text = await hass.async_add_executor_job(
+            manifest.read_text, "utf-8"
+        )
+        version = _json.loads(manifest_text).get("version", "0")
     except (OSError, ValueError):
         pass
 
@@ -161,10 +164,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from homeassistant.helpers import entity_registry as er
     ent_reg = er.async_get(hass)
     for ent in er.async_entries_for_config_entry(ent_reg, entry.entry_id):
-        if (
-            ent.entity_id.startswith("button.")
-            and ent.disabled_by == er.RegistryEntryDisabler.INTEGRATION
-        ):
+        if not ent.entity_id.startswith("button."):
+            continue
+        if ent.disabled_by == er.RegistryEntryDisabler.INTEGRATION:
+            # Clear disabled_by, ensure hidden_by is set
             ent_reg.async_update_entity(
                 ent.entity_id,
                 disabled_by=None,
