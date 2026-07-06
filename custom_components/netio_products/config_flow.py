@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from collections.abc import Mapping
+
 import voluptuous as vol
 
 from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
@@ -40,13 +42,12 @@ async def _test_connection(
     scheme = "https" if use_ssl else "http"
     base_url = f"{scheme}://{host}:{port}"
 
-    session = async_get_clientsession(hass, verify_ssl=False)
+    session = async_get_clientsession(hass, verify_ssl=not use_ssl)
     client = NetioApiClient(
         base_url=base_url,
         username=username,
         password=password,
         session=session,
-        verify_ssl=not use_ssl,
     )
 
     try:
@@ -68,7 +69,7 @@ async def _test_connection(
 class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for NETIO devices."""
 
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self) -> None:
         """Initialize the config flow."""
@@ -80,7 +81,59 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     def async_get_options_flow(config_entry):
         """Get the options flow handler."""
-        return NetioOptionsFlow(config_entry)
+        return NetioOptionsFlow()
+
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> ConfigFlowResult:
+        """Handle reauthentication after an authentication failure."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for new credentials and validate them."""
+        errors: dict[str, str] = {}
+        entry = self._get_reauth_entry()
+
+        if user_input is not None:
+            username = user_input[CONF_USERNAME]
+            password = user_input[CONF_PASSWORD]
+
+            state, error = await _test_connection(
+                self.hass,
+                entry.data[CONF_HOST],
+                entry.data[CONF_PORT],
+                username,
+                password,
+                entry.data.get(CONF_USE_SSL, False),
+            )
+
+            if error:
+                errors["base"] = error
+            else:
+                return self.async_update_reload_and_abort(
+                    entry,
+                    data_updates={
+                        CONF_USERNAME: username,
+                        CONF_PASSWORD: password,
+                    },
+                )
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            description_placeholders={"host": entry.data[CONF_HOST]},
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_USERNAME,
+                        default=entry.data.get(CONF_USERNAME, DEFAULT_USERNAME),
+                    ): str,
+                    vol.Required(CONF_PASSWORD): str,
+                }
+            ),
+            errors=errors,
+        )
 
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
@@ -317,10 +370,6 @@ class NetioOptionsFlow(OptionsFlow):
     hass.states and won't appear in Lovelace cards.
     """
 
-    def __init__(self, config_entry) -> None:
-        """Initialize the options flow."""
-        self._config_entry = config_entry
-
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -337,7 +386,7 @@ class NetioOptionsFlow(OptionsFlow):
 
             ent_reg = er.async_get(self.hass)
             entries = er.async_entries_for_config_entry(
-                ent_reg, self._config_entry.entry_id
+                ent_reg, self.config_entry.entry_id
             )
 
             for entry in entries:
@@ -352,32 +401,25 @@ class NetioOptionsFlow(OptionsFlow):
                 elif entry.entity_id.endswith("_toggle"):
                     should_hide = not new_options[CONF_ENABLE_TOGGLE]
 
-                # Determine current visibility state (check both flags)
-                is_hidden = (
-                    entry.hidden_by == er.RegistryEntryHider.INTEGRATION
-                    or entry.disabled_by in (
-                        er.RegistryEntryDisabler.INTEGRATION,
-                        er.RegistryEntryDisabler.DEVICE,
-                    )
-                )
+                # Only toggle our own hidden_by flag; entities disabled or
+                # hidden by the user/device stay untouched.
+                is_hidden = entry.hidden_by is er.RegistryEntryHider.INTEGRATION
 
-                if should_hide and not is_hidden:
+                if should_hide and entry.hidden_by is None:
                     ent_reg.async_update_entity(
                         entry.entity_id,
-                        disabled_by=None,
                         hidden_by=er.RegistryEntryHider.INTEGRATION,
                     )
                 elif not should_hide and is_hidden:
                     ent_reg.async_update_entity(
                         entry.entity_id,
-                        disabled_by=None,
                         hidden_by=None,
                     )
 
             return self.async_create_entry(title="", data=new_options)
 
         # Current options with defaults
-        options = self._config_entry.options
+        options = self.config_entry.options
         schema = vol.Schema(
             {
                 vol.Optional(

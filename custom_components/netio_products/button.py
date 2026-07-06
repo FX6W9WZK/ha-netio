@@ -18,6 +18,7 @@ import logging
 
 from homeassistant.components.button import ButtonDeviceClass, ButtonEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -86,9 +87,9 @@ class NetioRestartButton(NetioOutputEntity, ButtonEntity):
             )
             self.coordinator.async_set_updated_data(new_state)
         except NetioApiError as err:
-            _LOGGER.error(
-                "Failed to restart output %d: %s", self._output_id, err
-            )
+            raise HomeAssistantError(
+                f"Failed to restart output {self._output_id}: {err}"
+            ) from err
 
 
 class NetioShortOnButton(NetioOutputEntity, ButtonEntity):
@@ -121,9 +122,9 @@ class NetioShortOnButton(NetioOutputEntity, ButtonEntity):
             )
             self.coordinator.async_set_updated_data(new_state)
         except NetioApiError as err:
-            _LOGGER.error(
-                "Failed to short-on output %d: %s", self._output_id, err
-            )
+            raise HomeAssistantError(
+                f"Failed to short-on output {self._output_id}: {err}"
+            ) from err
 
 
 class NetioToggleButton(NetioOutputEntity, ButtonEntity):
@@ -154,6 +155,6 @@ class NetioToggleButton(NetioOutputEntity, ButtonEntity):
             )
             self.coordinator.async_set_updated_data(new_state)
         except NetioApiError as err:
-            _LOGGER.error(
-                "Failed to toggle output %d: %s", self._output_id, err
-            )
+            raise HomeAssistantError(
+                f"Failed to toggle output {self._output_id}: {err}"
+            ) from err

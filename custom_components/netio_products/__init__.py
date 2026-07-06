@@ -109,6 +109,37 @@ async def _register_card(hass: HomeAssistant) -> None:
     _CARD_REGISTERED = True
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate old config entries to the current version."""
+    if entry.version > 2:
+        # Downgrade from a future version is not supported
+        return False
+
+    if entry.version == 1:
+        # v1 → v2: versions before v1.3.7 disabled button entities via
+        # disabled_by=INTEGRATION, which removes them from hass.states.
+        # Convert once to hidden_by=INTEGRATION. Entities disabled by the
+        # user or via the device are deliberately left untouched.
+        from homeassistant.helpers import entity_registry as er
+
+        ent_reg = er.async_get(hass)
+        for ent in er.async_entries_for_config_entry(ent_reg, entry.entry_id):
+            if not ent.entity_id.startswith("button."):
+                continue
+            if ent.disabled_by is er.RegistryEntryDisabler.INTEGRATION:
+                ent_reg.async_update_entity(
+                    ent.entity_id,
+                    disabled_by=None,
+                    hidden_by=er.RegistryEntryHider.INTEGRATION,
+                )
+                _LOGGER.debug(
+                    "Migrated %s: disabled_by → hidden_by", ent.entity_id
+                )
+        hass.config_entries.async_update_entry(entry, version=2)
+
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up NETIO from a config entry."""
     await _register_card(hass)
@@ -122,13 +153,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     scheme = "https" if use_ssl else "http"
     base_url = f"{scheme}://{host}:{port}"
 
-    session = async_get_clientsession(hass, verify_ssl=False)
+    # NETIO devices ship with self-signed certificates, so skip
+    # certificate verification only for HTTPS connections.
+    session = async_get_clientsession(hass, verify_ssl=not use_ssl)
     client = NetioApiClient(
         base_url=base_url,
         username=username,
         password=password,
         session=session,
-        verify_ssl=not use_ssl,
     )
 
     coordinator = NetioCoordinator(hass, client, entry)
@@ -157,26 +189,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-
-    # Migrate button entities: disabled_by=integration → hidden_by=integration
-    # Versions before v1.3.7 used disabled_by which completely removes entities
-    # from hass.states. We want hidden_by which keeps them functional.
-    from homeassistant.helpers import entity_registry as er
-    ent_reg = er.async_get(hass)
-    for ent in er.async_entries_for_config_entry(ent_reg, entry.entry_id):
-        if not ent.entity_id.startswith("button."):
-            continue
-        if ent.disabled_by in (
-            er.RegistryEntryDisabler.INTEGRATION,
-            er.RegistryEntryDisabler.DEVICE,
-        ):
-            # Clear disabled_by, ensure hidden_by is set
-            ent_reg.async_update_entity(
-                ent.entity_id,
-                disabled_by=None,
-                hidden_by=er.RegistryEntryHider.INTEGRATION,
-            )
-            _LOGGER.debug("Migrated %s: disabled_by → hidden_by", ent.entity_id)
 
     # Force-update configuration_url in device registry (HA caches it)
     device = dev_reg.async_get_device(identifiers={(DOMAIN, serial)})

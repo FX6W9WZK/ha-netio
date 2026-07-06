@@ -223,8 +223,7 @@ class NetioApiClient:
         base_url: str,
         username: str,
         password: str,
-        session: aiohttp.ClientSession | None = None,
-        verify_ssl: bool = True,
+        session: aiohttp.ClientSession,
     ) -> None:
         """Initialize the API client.
 
@@ -233,32 +232,16 @@ class NetioApiClient:
                       "http://192.168.1.100:8080"
             username: JSON API username
             password: JSON API password
-            session: Optional aiohttp session (created if not provided)
-            verify_ssl: Whether to verify SSL certificates
+            session: aiohttp session (managed by Home Assistant)
         """
         self._base_url = base_url.rstrip("/")
         self._auth = aiohttp.BasicAuth(username, password)
         self._session = session
-        self._owns_session = session is None
-        self._verify_ssl = verify_ssl
         self._url = f"{self._base_url}{NETIO_JSON_ENDPOINT}"
         # Web admin URL (without API port)
         from urllib.parse import urlparse
         parsed = urlparse(self._base_url)
         self.web_url = f"{parsed.scheme}://{parsed.hostname}"
-
-    async def _get_session(self) -> aiohttp.ClientSession:
-        """Get or create the aiohttp session."""
-        if self._session is None or self._session.closed:
-            connector = aiohttp.TCPConnector(ssl=self._verify_ssl)
-            self._session = aiohttp.ClientSession(connector=connector)
-            self._owns_session = True
-        return self._session
-
-    async def close(self) -> None:
-        """Close the session if we own it."""
-        if self._owns_session and self._session and not self._session.closed:
-            await self._session.close()
 
     async def get_state(self) -> NetioDeviceState:
         """Read device state via HTTP GET.
@@ -271,7 +254,7 @@ class NetioApiClient:
             NetioConnectionError: Cannot reach device
             NetioApiError: Other API errors
         """
-        session = await self._get_session()
+        session = self._session
         try:
             async with session.get(
                 self._url,
@@ -355,7 +338,7 @@ class NetioApiClient:
         Per documentation, a successful POST returns HTTP 200 and
         the current device state as JSON.
         """
-        session = await self._get_session()
+        session = self._session
         try:
             async with session.post(
                 self._url,

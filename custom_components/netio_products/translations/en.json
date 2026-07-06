@@ -41,6 +41,14 @@
           "enable_short_on": "Short ON",
           "enable_toggle": "Toggle"
         }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate NETIO device",
+        "description": "The credentials for {host} are no longer valid. Enter the current JSON API credentials.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -49,7 +57,8 @@
       "unknown": "Unexpected error."
     },
     "abort": {
-      "already_configured": "This device is already configured."
+      "already_configured": "This device is already configured.",
+      "reauth_successful": "Re-authentication was successful"
     }
   },
   "options": {

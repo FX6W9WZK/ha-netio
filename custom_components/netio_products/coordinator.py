@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import (
@@ -53,7 +54,7 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
         try:
             state = await self.client.get_state()
         except NetioAuthError as err:
-            raise UpdateFailed(f"Authentication failed: {err}") from err
+            raise ConfigEntryAuthFailed(f"Authentication failed: {err}") from err
         except NetioConnectionError as err:
             raise UpdateFailed(f"Connection error: {err}") from err
         except NetioApiError as err:

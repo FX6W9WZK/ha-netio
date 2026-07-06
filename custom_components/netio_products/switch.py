@@ -16,6 +16,7 @@ from typing import Any
 
 from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import NetioApiError
@@ -99,7 +100,9 @@ class NetioSwitch(NetioOutputEntity, SwitchEntity):
             )
             self.coordinator.async_set_updated_data(new_state)
         except NetioApiError as err:
-            _LOGGER.error("Failed to turn on output %d: %s", self._output_id, err)
+            raise HomeAssistantError(
+                f"Failed to turn on output {self._output_id}: {err}"
+            ) from err
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the output off.
@@ -112,4 +115,6 @@ class NetioSwitch(NetioOutputEntity, SwitchEntity):
             )
             self.coordinator.async_set_updated_data(new_state)
         except NetioApiError as err:
-            _LOGGER.error("Failed to turn off output %d: %s", self._output_id, err)
+            raise HomeAssistantError(
+                f"Failed to turn off output {self._output_id}: {err}"
+            ) from err

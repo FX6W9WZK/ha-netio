@@ -41,6 +41,14 @@
           "enable_short_on": "Kurz Ein (Short ON)",
           "enable_toggle": "Umschalten (Toggle)"
         }
+      },
+      "reauth_confirm": {
+        "title": "NETIO-Gerät neu authentifizieren",
+        "description": "Die Zugangsdaten für {host} sind nicht mehr gültig. Gib die aktuellen JSON-API-Zugangsdaten ein.",
+        "data": {
+          "username": "Benutzername",
+          "password": "Passwort"
+        }
       }
     },
     "error": {
@@ -49,7 +57,8 @@
       "unknown": "Unerwarteter Fehler."
     },
     "abort": {
-      "already_configured": "Dieses Gerät ist bereits eingerichtet."
+      "already_configured": "Dieses Gerät ist bereits eingerichtet.",
+      "reauth_successful": "Erneute Authentifizierung erfolgreich"
     }
   },
   "options": {
