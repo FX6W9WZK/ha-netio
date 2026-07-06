@@ -16,8 +16,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.config_entries import ConfigEntry
-from .coordinator import NetioCoordinator
+from .coordinator import NetioConfigEntry, NetioCoordinator
 from .entity import NetioEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,11 +24,11 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: NetioConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up NETIO binary sensors from a config entry."""
-    coordinator: NetioCoordinator = entry.runtime_data
+    coordinator = entry.runtime_data
 
     if not coordinator.has_inputs:
         return
@@ -50,6 +49,8 @@ class NetioInputBinarySensor(NetioEntity, BinarySensorEntity):
     - State 1 = "closed" / OFF
     """
 
+    _attr_translation_key = "input"
+
     def __init__(
         self, coordinator: NetioCoordinator, input_id: int
     ) -> None:
@@ -59,6 +60,12 @@ class NetioInputBinarySensor(NetioEntity, BinarySensorEntity):
         self._attr_unique_id = (
             f"{coordinator.device_serial}_input_{input_id}"
         )
+        input_name = f"Input {input_id}"
+        for inp in coordinator.data.inputs:
+            if inp.id == input_id and inp.name:
+                input_name = inp.name
+                break
+        self._attr_translation_placeholders = {"input_name": input_name}
 
     @property
     def _input(self):
@@ -68,14 +75,6 @@ class NetioInputBinarySensor(NetioEntity, BinarySensorEntity):
                 if inp.id == self._input_id:
                     return inp
         return None
-
-    @property
-    def name(self) -> str | None:
-        """Return the name of the input."""
-        inp = self._input
-        if inp and inp.name:
-            return inp.name
-        return f"Input {self._input_id}"
 
     @property
     def is_on(self) -> bool | None:

@@ -140,7 +140,7 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle reconfiguration of connection settings."""
         errors: dict[str, str] = {}
-        entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
+        entry = self._get_reconfigure_entry()
 
         if user_input is not None:
             host = user_input[CONF_HOST]
@@ -156,6 +156,16 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
             if error:
                 errors["base"] = error
             else:
+                # Make sure the user is still talking to the same device
+                # before overwriting the stored connection settings.
+                serial = (
+                    state.agent.serial_number
+                    or state.agent.mac.replace(":", "")
+                    or f"{host}_{port}"
+                )
+                await self.async_set_unique_id(serial)
+                self._abort_if_unique_id_mismatch(reason="wrong_device")
+
                 return self.async_update_reload_and_abort(
                     entry,
                     data={
@@ -208,6 +218,14 @@ class NetioConfigFlow(ConfigFlow, domain=DOMAIN):
         mac_clean = discovery_info.macaddress.replace(":", "").upper()
         await self.async_set_unique_id(mac_clean)
         self._abort_if_unique_id_configured(updates={CONF_HOST: discovery_info.ip})
+
+        # Existing entries use the SerialNumber as unique_id, which may
+        # differ from the MAC. The MAC-based check above cannot match
+        # those, so also match on the stored host to avoid duplicate
+        # discovery flows for already configured devices.
+        for entry in self._async_current_entries(include_ignore=False):
+            if entry.data.get(CONF_HOST) == discovery_info.ip:
+                return self.async_abort(reason="already_configured")
 
         # Try to connect with default credentials to get device info
         state, _ = await _test_connection(

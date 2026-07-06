@@ -20,9 +20,8 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import NetioApiError
-from .const import ACTION_OFF, ACTION_ON, DOMAIN, STATE_OUTPUT_ON
-from homeassistant.config_entries import ConfigEntry
-from .coordinator import NetioCoordinator
+from .const import ACTION_OFF, ACTION_ON, STATE_OUTPUT_ON
+from .coordinator import NetioConfigEntry, NetioCoordinator
 from .entity import NetioOutputEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,11 +29,11 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: NetioConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up NETIO switches from a config entry."""
-    coordinator: NetioCoordinator = entry.runtime_data
+    coordinator = entry.runtime_data
 
     entities = [
         NetioSwitch(coordinator, output.id)
@@ -51,6 +50,7 @@ class NetioSwitch(NetioOutputEntity, SwitchEntity):
     """
 
     _attr_device_class = SwitchDeviceClass.OUTLET
+    _attr_translation_key = "switch"
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         """Initialize the switch.
@@ -70,15 +70,6 @@ class NetioSwitch(NetioOutputEntity, SwitchEntity):
                 if output.id == self._output_id:
                     return output
         return None
-
-    @property
-    def name(self) -> str | None:
-        """Return the name of the switch entity.
-
-        Since the outlet name is already in the sub-device name,
-        we return a simple "Switch" label here.
-        """
-        return "Switch"
 
     @property
     def is_on(self) -> bool | None:

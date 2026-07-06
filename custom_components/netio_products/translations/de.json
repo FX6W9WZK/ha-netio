@@ -58,7 +58,69 @@
     },
     "abort": {
       "already_configured": "Dieses Gerät ist bereits eingerichtet.",
-      "reauth_successful": "Erneute Authentifizierung erfolgreich"
+      "reauth_successful": "Erneute Authentifizierung erfolgreich",
+      "wrong_device": "Dies ist ein anderes Gerät als das ursprünglich konfigurierte"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "input": {
+        "name": "{input_name}"
+      }
+    },
+    "button": {
+      "restart": {
+        "name": "Neustart"
+      },
+      "short_on": {
+        "name": "Kurz EIN"
+      },
+      "toggle": {
+        "name": "Umschalten"
+      }
+    },
+    "sensor": {
+      "current": {
+        "name": "Strom"
+      },
+      "load": {
+        "name": "Leistung"
+      },
+      "energy": {
+        "name": "Energie"
+      },
+      "power_factor": {
+        "name": "Leistungsfaktor"
+      },
+      "reverse_energy": {
+        "name": "Rückspeiseenergie"
+      },
+      "voltage": {
+        "name": "Spannung"
+      },
+      "frequency": {
+        "name": "Frequenz"
+      },
+      "total_current": {
+        "name": "Gesamtstrom"
+      },
+      "total_load": {
+        "name": "Gesamtleistung"
+      },
+      "total_energy": {
+        "name": "Gesamtenergie"
+      },
+      "total_power_factor": {
+        "name": "Gesamt-Leistungsfaktor"
+      },
+      "s0_counter": {
+        "name": "{input_name} S0-Zähler"
+      }
+    },
+    "switch": {
+      "switch": {
+        "name": "Schalter"
+      }
     }
   },
   "options": {

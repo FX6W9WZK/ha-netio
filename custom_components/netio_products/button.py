@@ -24,8 +24,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import NetioApiError
 from .const import ACTION_SHORT_OFF, ACTION_SHORT_ON, ACTION_TOGGLE, CONF_ENABLE_RESTART, CONF_ENABLE_SHORT_ON, CONF_ENABLE_TOGGLE
-from homeassistant.config_entries import ConfigEntry
-from .coordinator import NetioCoordinator
+from .coordinator import NetioConfigEntry, NetioCoordinator
 from .entity import NetioOutputEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,11 +32,11 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: NetioConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up NETIO buttons from a config entry."""
-    coordinator: NetioCoordinator = entry.runtime_data
+    coordinator = entry.runtime_data
 
     entities: list[ButtonEntity] = []
     for output in coordinator.data.outputs:
@@ -67,6 +66,7 @@ class NetioRestartButton(NetioOutputEntity, ButtonEntity):
     _attr_icon = "mdi:restart"
     _attr_device_class = ButtonDeviceClass.RESTART
     _attr_entity_category = EntityCategory.CONFIG
+    _attr_translation_key = "restart"
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
@@ -74,10 +74,6 @@ class NetioRestartButton(NetioOutputEntity, ButtonEntity):
         self._attr_entity_registry_visible_default = (
             coordinator.config_entry.options.get(CONF_ENABLE_RESTART, True)
         )
-
-    @property
-    def name(self) -> str | None:
-        return "Restart"
 
     async def async_press(self) -> None:
         """Execute short OFF (restart) on the output."""
@@ -102,6 +98,7 @@ class NetioShortOnButton(NetioOutputEntity, ButtonEntity):
 
     _attr_icon = "mdi:timer-outline"
     _attr_entity_category = EntityCategory.CONFIG
+    _attr_translation_key = "short_on"
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
@@ -109,10 +106,6 @@ class NetioShortOnButton(NetioOutputEntity, ButtonEntity):
         self._attr_entity_registry_visible_default = (
             coordinator.config_entry.options.get(CONF_ENABLE_SHORT_ON, True)
         )
-
-    @property
-    def name(self) -> str | None:
-        return "Short ON"
 
     async def async_press(self) -> None:
         """Execute short ON on the output."""
@@ -135,6 +128,7 @@ class NetioToggleButton(NetioOutputEntity, ButtonEntity):
 
     _attr_icon = "mdi:toggle-switch-outline"
     _attr_entity_category = EntityCategory.CONFIG
+    _attr_translation_key = "toggle"
 
     def __init__(self, coordinator: NetioCoordinator, output_id: int) -> None:
         super().__init__(coordinator, output_id)
@@ -142,10 +136,6 @@ class NetioToggleButton(NetioOutputEntity, ButtonEntity):
         self._attr_entity_registry_visible_default = (
             coordinator.config_entry.options.get(CONF_ENABLE_TOGGLE, True)
         )
-
-    @property
-    def name(self) -> str | None:
-        return "Toggle"
 
     async def async_press(self) -> None:
         """Toggle the output."""

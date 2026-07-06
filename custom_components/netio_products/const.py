@@ -4,8 +4,6 @@ from __future__ import annotations
 
 DOMAIN = "netio_products"
 
-CONF_DEVICE_URL = "device_url"
-
 # Default JSON API credentials per NETIO documentation
 DEFAULT_USERNAME = "netio"
 DEFAULT_PASSWORD = "netio"

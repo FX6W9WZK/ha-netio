@@ -31,8 +31,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from homeassistant.config_entries import ConfigEntry
-from .coordinator import NetioCoordinator
+from .coordinator import NetioConfigEntry, NetioCoordinator
 from .entity import NetioEntity, NetioOutputEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -166,11 +165,11 @@ GLOBAL_SENSORS: tuple[NetioGlobalSensorDescription, ...] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: NetioConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up NETIO sensors from a config entry."""
-    coordinator: NetioCoordinator = entry.runtime_data
+    coordinator = entry.runtime_data
     entities: list[SensorEntity] = []
 
     # Per-output sensors: only create for outputs that report metering
@@ -226,15 +225,6 @@ class NetioOutputSensor(NetioOutputEntity, SensorEntity):
         return None
 
     @property
-    def name(self) -> str | None:
-        """Return the sensor name.
-
-        Since the outlet name is already in the sub-device name,
-        we only return the measurement type here.
-        """
-        return self.entity_description.key.replace("_", " ").title()
-
-    @property
     def native_value(self):
         """Return the sensor value."""
         output = self._output
@@ -261,11 +251,6 @@ class NetioGlobalSensor(NetioEntity, SensorEntity):
         )
 
     @property
-    def name(self) -> str | None:
-        """Return the sensor name."""
-        return self.entity_description.key.replace("_", " ").title()
-
-    @property
     def native_value(self):
         """Return the sensor value."""
         if not self.coordinator.data:
@@ -285,6 +270,7 @@ class NetioInputCounterSensor(NetioEntity, SensorEntity):
 
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _attr_icon = "mdi:counter"
+    _attr_translation_key = "s0_counter"
 
     def __init__(
         self, coordinator: NetioCoordinator, input_id: int
@@ -295,6 +281,12 @@ class NetioInputCounterSensor(NetioEntity, SensorEntity):
         self._attr_unique_id = (
             f"{coordinator.device_serial}_input_{input_id}_s0counter"
         )
+        input_name = f"Input {input_id}"
+        for inp in coordinator.data.inputs:
+            if inp.id == input_id and inp.name:
+                input_name = inp.name
+                break
+        self._attr_translation_placeholders = {"input_name": input_name}
 
     @property
     def _input(self):
@@ -304,13 +296,6 @@ class NetioInputCounterSensor(NetioEntity, SensorEntity):
                 if inp.id == self._input_id:
                     return inp
         return None
-
-    @property
-    def name(self) -> str | None:
-        """Return the sensor name."""
-        inp = self._input
-        input_name = inp.name if inp else f"Input {self._input_id}"
-        return f"{input_name} S0 counter"
 
     @property
     def native_value(self) -> int | None:

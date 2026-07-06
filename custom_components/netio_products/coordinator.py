@@ -4,14 +4,15 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
-from typing import TYPE_CHECKING
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import (
+    NetioAgent,
     NetioApiClient,
     NetioApiError,
     NetioAuthError,
@@ -22,6 +23,36 @@ from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+type NetioConfigEntry = ConfigEntry[NetioCoordinator]
+
+
+def compute_serial(agent: NetioAgent, fallback: str) -> str:
+    """Compute the device serial (unique identifier).
+
+    Per JSON API doc: SerialNumber is identical with the label on
+    the delivery box. Prefer SerialNumber over MAC when available.
+    """
+    if agent.serial_number:
+        return agent.serial_number
+    if agent.mac:
+        return agent.mac.replace(":", "")
+    return fallback
+
+
+def build_device_info(coordinator: NetioCoordinator) -> DeviceInfo:
+    """Build the DeviceInfo for the parent NETIO device."""
+    agent = coordinator.data.agent
+    serial = coordinator.device_serial
+    return DeviceInfo(
+        identifiers={(DOMAIN, serial)},
+        name=agent.device_name or agent.model or "NETIO Device",
+        manufacturer="NETIO products a.s.",
+        model=agent.model,
+        sw_version=agent.version,
+        serial_number=serial,
+        configuration_url=coordinator.client.web_url,
+    )
+
 
 class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
     """Coordinator to manage fetching NETIO device state.
@@ -29,13 +60,13 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
     Polls the device via JSON API GET at a regular interval.
     """
 
-    config_entry: ConfigEntry
+    config_entry: NetioConfigEntry
 
     def __init__(
         self,
         hass: HomeAssistant,
         client: NetioApiClient,
-        config_entry: ConfigEntry,
+        config_entry: NetioConfigEntry,
     ) -> None:
         """Initialize the coordinator."""
         self.client = client
@@ -70,7 +101,7 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
         agent = state.agent
         # Compute serial from the current state, not self.device_serial,
         # because self.data may still be None during first poll.
-        serial = agent.serial_number or (agent.mac.replace(":", "") if agent.mac else self.config_entry.entry_id)
+        serial = compute_serial(agent, self.config_entry.entry_id)
         device_name = agent.device_name or agent.model or "NETIO Device"
 
         # Check if any name actually changed
@@ -117,10 +148,8 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
         Per JSON API doc: SerialNumber is identical with the label on
         the delivery box. Prefer SerialNumber over MAC when available.
         """
-        if self.data and self.data.agent.serial_number:
-            return self.data.agent.serial_number
-        if self.data and self.data.agent.mac:
-            return self.data.agent.mac.replace(":", "")
+        if self.data:
+            return compute_serial(self.data.agent, self.config_entry.entry_id)
         return self.config_entry.entry_id
 
     @property

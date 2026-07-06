@@ -12,7 +12,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import NetioApiClient
 from .const import DOMAIN
-from .coordinator import NetioCoordinator
+from .coordinator import NetioConfigEntry, NetioCoordinator, build_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -140,7 +140,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: NetioConfigEntry) -> bool:
     """Set up NETIO from a config entry."""
     await _register_card(hass)
 
@@ -176,16 +176,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from homeassistant.helpers import device_registry as dr
     dev_reg = dr.async_get(hass)
     serial = coordinator.device_serial
-    agent = coordinator.data.agent
     dev_reg.async_get_or_create(
         config_entry_id=entry.entry_id,
-        identifiers={(DOMAIN, serial)},
-        name=agent.device_name or agent.model or "NETIO Device",
-        manufacturer="NETIO products a.s.",
-        model=agent.model,
-        sw_version=agent.version,
-        serial_number=serial,
-        configuration_url=client.web_url,
+        **build_device_info(coordinator),
     )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

@@ -24,9 +24,6 @@ import aiohttp
 
 from .const import (
     ACTION_IGNORED,
-    ACTION_OFF,
-    ACTION_ON,
-    ACTION_TOGGLE,
     NETIO_JSON_ENDPOINT,
 )
 
@@ -238,10 +235,17 @@ class NetioApiClient:
         self._auth = aiohttp.BasicAuth(username, password)
         self._session = session
         self._url = f"{self._base_url}{NETIO_JSON_ENDPOINT}"
-        # Web admin URL (without API port)
+        # Web admin URL: strip the API port only if it is a standard
+        # HTTP(S) port; keep non-standard ports (and IPv6 brackets) intact.
         from urllib.parse import urlparse
         parsed = urlparse(self._base_url)
-        self.web_url = f"{parsed.scheme}://{parsed.hostname}"
+        if parsed.port in (80, 443):
+            host = parsed.hostname or ""
+            if ":" in host:  # IPv6 address needs brackets
+                host = f"[{host}]"
+            self.web_url = f"{parsed.scheme}://{host}"
+        else:
+            self.web_url = f"{parsed.scheme}://{parsed.netloc}"
 
     async def get_state(self) -> NetioDeviceState:
         """Read device state via HTTP GET.
@@ -272,7 +276,7 @@ class NetioApiClient:
                     )
                 try:
                     data = await resp.json(content_type=None)
-                except (ValueError, Exception) as err:
+                except (aiohttp.ContentTypeError, ValueError) as err:
                     text = await resp.text()
                     raise NetioApiError(
                         f"Invalid JSON response: {err} (body: {text[:200]})"
@@ -364,7 +368,7 @@ class NetioApiClient:
 
                 try:
                     data = await resp.json(content_type=None)
-                except (ValueError, Exception) as err:
+                except (aiohttp.ContentTypeError, ValueError) as err:
                     text = await resp.text()
                     raise NetioApiError(
                         f"Invalid JSON response: {err} (body: {text[:200]})"

@@ -58,7 +58,69 @@
     },
     "abort": {
       "already_configured": "This device is already configured.",
-      "reauth_successful": "Re-authentication was successful"
+      "reauth_successful": "Re-authentication was successful",
+      "wrong_device": "This is a different device than the one originally configured"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "input": {
+        "name": "{input_name}"
+      }
+    },
+    "button": {
+      "restart": {
+        "name": "Restart"
+      },
+      "short_on": {
+        "name": "Short ON"
+      },
+      "toggle": {
+        "name": "Toggle"
+      }
+    },
+    "sensor": {
+      "current": {
+        "name": "Current"
+      },
+      "load": {
+        "name": "Load"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "power_factor": {
+        "name": "Power Factor"
+      },
+      "reverse_energy": {
+        "name": "Reverse Energy"
+      },
+      "voltage": {
+        "name": "Voltage"
+      },
+      "frequency": {
+        "name": "Frequency"
+      },
+      "total_current": {
+        "name": "Total Current"
+      },
+      "total_load": {
+        "name": "Total Load"
+      },
+      "total_energy": {
+        "name": "Total Energy"
+      },
+      "total_power_factor": {
+        "name": "Total Power Factor"
+      },
+      "s0_counter": {
+        "name": "{input_name} S0 counter"
+      }
+    },
+    "switch": {
+      "switch": {
+        "name": "Switch"
+      }
     }
   },
   "options": {
