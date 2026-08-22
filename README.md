@@ -1,6 +1,6 @@
 # NETIO for Home Assistant
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 [![Validate](https://github.com/FX6W9WZK/ha-netio/actions/workflows/validate.yaml/badge.svg)](https://github.com/FX6W9WZK/ha-netio/actions/workflows/validate.yaml)
 [![GitHub Release](https://img.shields.io/github/v/release/FX6W9WZK/ha-netio)](https://github.com/FX6W9WZK/ha-netio/releases)
 [![Built with Claude AI](https://img.shields.io/badge/Built_with-Claude_AI-D4A27F?logo=anthropic&logoColor=white)](https://www.anthropic.com/claude)
@@ -52,11 +52,11 @@ The integration auto-detects metering support from the device's JSON API respons
 
 ### HACS (recommended)
 
+NETIO is part of the HACS default repository list:
+
 1. Open HACS in Home Assistant
-2. Click the three dots → **Custom repositories**
-3. Add `https://github.com/FX6W9WZK/ha-netio` as **Integration**
-4. Search for "NETIO" and install
-5. Restart Home Assistant
+2. Search for "NETIO" and install
+3. Restart Home Assistant
 
 ### Manual
 
