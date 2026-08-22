@@ -4,7 +4,7 @@ Two base classes:
 - NetioEntity: for device-level entities (global sensors, digital inputs).
   Registered under the main NETIO device.
 - NetioOutputEntity: for per-outlet entities (switch, per-output sensors, buttons).
-  Each outlet is registered as its own sub-device via `via_device`,
+  Each outlet is registered as its own sub-device linked to the parent,
   so outlets can be assigned to different rooms in Home Assistant.
 """
 
@@ -44,7 +44,7 @@ class NetioOutputEntity(CoordinatorEntity[NetioCoordinator]):
     NETIO device. This allows assigning individual outlets to
     different rooms in Home Assistant.
 
-    The sub-device uses `via_device` to link back to the parent.
+    The sub-device uses `via_device_id` to link back to the parent.
     """
 
     _attr_has_entity_name = True
@@ -71,11 +71,13 @@ class NetioOutputEntity(CoordinatorEntity[NetioCoordinator]):
 
         device_name = agent.device_name or agent.model or "NETIO Device"
 
-        self._attr_device_info = DeviceInfo(
+        device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{serial}_output_{output_id}")},
             name=f"{device_name} {output_name}",
             manufacturer="NETIO products a.s.",
             model=agent.model,
             sw_version=agent.version,
-            via_device=(DOMAIN, serial),
         )
+        if coordinator.parent_device_id is not None:
+            device_info["via_device_id"] = coordinator.parent_device_id
+        self._attr_device_info = device_info

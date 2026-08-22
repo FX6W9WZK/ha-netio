@@ -11,7 +11,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import NetioApiClient
-from .const import DOMAIN
 from .coordinator import NetioConfigEntry, NetioCoordinator, build_device_info
 
 _LOGGER = logging.getLogger(__name__)
@@ -170,21 +169,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: NetioConfigEntry) -> boo
 
     # Explicitly register the parent device BEFORE platform setup.
     # This ensures the parent device exists so sub-devices can reference
-    # it via via_device. Without this, if no global entities exist,
+    # it via via_device_id. Without this, if no global entities exist,
     # the parent device would never be created and sub-devices would
     # have via_device_id=null.
     from homeassistant.helpers import device_registry as dr
     dev_reg = dr.async_get(hass)
-    serial = coordinator.device_serial
-    dev_reg.async_get_or_create(
+    parent = dev_reg.async_get_or_create(
         config_entry_id=entry.entry_id,
         **build_device_info(coordinator),
     )
+    coordinator.parent_device_id = parent.id
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # Force-update configuration_url in device registry (HA caches it)
-    device = dev_reg.async_get_device(identifiers={(DOMAIN, serial)})
+    device = dev_reg.async_get(parent.id)
     if device and device.configuration_url != client.web_url:
         dev_reg.async_update_device(
             device.id, configuration_url=client.web_url

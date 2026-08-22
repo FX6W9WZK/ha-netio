@@ -70,6 +70,9 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
     ) -> None:
         """Initialize the coordinator."""
         self.client = client
+        # Registry id of the parent device; set during setup before the
+        # platforms are forwarded, used for via_device_id links.
+        self.parent_device_id: str | None = None
         self._last_device_name: str | None = None
         self._last_output_names: dict[int, str] = {}
         super().__init__(
@@ -120,7 +123,9 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
 
         # Update parent device name
         if device_name != self._last_device_name:
-            device = dev_reg.async_get_device(identifiers={(DOMAIN, serial)})
+            device = dev_reg.async_get_device_by_identifier(
+                (DOMAIN, serial), self.config_entry.entry_id
+            )
             if device and device.name != device_name:
                 dev_reg.async_update_device(device.id, name=device_name)
                 _LOGGER.debug("Updated device name: %s", device_name)
@@ -130,8 +135,9 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
         for output_id, output_name in current_output_names.items():
             if output_name != self._last_output_names.get(output_id):
                 full_name = f"{device_name} {output_name}"
-                sub_device = dev_reg.async_get_device(
-                    identifiers={(DOMAIN, f"{serial}_output_{output_id}")}
+                sub_device = dev_reg.async_get_device_by_identifier(
+                    (DOMAIN, f"{serial}_output_{output_id}"),
+                    self.config_entry.entry_id,
                 )
                 if sub_device and sub_device.name != full_name:
                     dev_reg.async_update_device(sub_device.id, name=full_name)
