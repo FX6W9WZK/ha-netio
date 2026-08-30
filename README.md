@@ -65,14 +65,22 @@ NETIO is part of the HACS default repository list:
 
 ## Configuration
 
+### Installation parameters
+
+| Parameter | Required | Default | Description |
+|---|---|---|---|
+| Host | yes | – | IP address or hostname of the NETIO device |
+| Port | no | `80` | Port of the JSON API |
+| Username | no | `netio` | JSON API username |
+| Password | no | `netio` | JSON API password |
+| Use SSL | no | off | Connect via HTTPS (self-signed certificates accepted) |
+
+During setup you also choose which button entity types (Restart, Short ON, Toggle) are created per output; this can be changed later via **Configure** on the integration.
+
 1. Go to **Settings** → **Devices & Services** → **Add Integration**
-2. Search for "NETIO"
-3. Enter:
-   - **Host**: IP address or hostname of your NETIO device
-   - **Port**: HTTP port (default: 80, check device web config)
-   - **Username**: JSON API username (default: `netio`)
-   - **Password**: JSON API password (default: `netio` for standard devices)
-   - **Use HTTPS**: Check if your device uses HTTPS (PowerPDU 4C only)
+2. Search for "NETIO" and enter the parameters above
+
+Devices are also discovered automatically via DHCP (NETIO MAC prefix) and offered for setup.
 
 ## Entities
 
@@ -345,3 +353,11 @@ Both approaches can coexist — you can use ha-netio for the main integration an
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
+
+## Removing the integration
+
+1. Go to **Settings → Devices & Services → NETIO**
+2. Open the three-dot menu of the config entry and choose **Delete**
+3. Restart Home Assistant
+
+All devices and entities are removed automatically. To also remove the files, uninstall the integration in HACS afterwards.

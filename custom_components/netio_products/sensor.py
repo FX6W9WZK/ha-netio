@@ -36,6 +36,9 @@ from .entity import NetioEntity, NetioOutputEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+# Writes go through async_set_updated_data; reads come from the coordinator.
+PARALLEL_UPDATES = 0
+
 
 @dataclass(frozen=True, kw_only=True)
 class NetioOutputSensorDescription(SensorEntityDescription):

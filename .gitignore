@@ -1,10 +1,11 @@
-__pycache__/
-*.py[cod]
 *$py.class
 *.egg-info/
-dist/
-build/
+*.py[cod]
+.coverage
 .eggs/
-.venv/
-venv/
 .env
+.venv/
+__pycache__/
+build/
+dist/
+venv/

@@ -10,6 +10,13 @@
           "username": "Username",
           "password": "Password",
           "use_ssl": "Use HTTPS"
+        },
+        "data_description": {
+          "host": "IP address or hostname of the NETIO device.",
+          "port": "Port of the JSON API (default 80, see device web config).",
+          "username": "JSON API username configured on the device.",
+          "password": "JSON API password configured on the device.",
+          "use_ssl": "Connect via HTTPS. NETIO devices use self-signed certificates, so certificate verification is skipped."
         }
       },
       "dhcp_confirm": {
@@ -20,6 +27,12 @@
           "username": "Username",
           "password": "Password",
           "use_ssl": "Use HTTPS"
+        },
+        "data_description": {
+          "port": "Port of the JSON API (default 80, see device web config).",
+          "username": "JSON API username configured on the device.",
+          "password": "JSON API password configured on the device.",
+          "use_ssl": "Connect via HTTPS. NETIO devices use self-signed certificates, so certificate verification is skipped."
         }
       },
       "reconfigure": {
@@ -31,6 +44,13 @@
           "username": "Username",
           "password": "Password",
           "use_ssl": "Use HTTPS"
+        },
+        "data_description": {
+          "host": "IP address or hostname of the NETIO device.",
+          "port": "Port of the JSON API (default 80, see device web config).",
+          "username": "JSON API username configured on the device.",
+          "password": "JSON API password configured on the device.",
+          "use_ssl": "Connect via HTTPS. NETIO devices use self-signed certificates, so certificate verification is skipped."
         }
       },
       "buttons": {
@@ -40,6 +60,11 @@
           "enable_restart": "Restart (Short OFF)",
           "enable_short_on": "Short ON",
           "enable_toggle": "Toggle"
+        },
+        "data_description": {
+          "enable_restart": "Create a restart button entity per output.",
+          "enable_short_on": "Create a short-ON button entity per output.",
+          "enable_toggle": "Create a toggle button entity per output."
         }
       },
       "reauth_confirm": {
@@ -48,6 +73,10 @@
         "data": {
           "username": "Username",
           "password": "Password"
+        },
+        "data_description": {
+          "username": "JSON API username configured on the device.",
+          "password": "JSON API password configured on the device."
         }
       }
     },

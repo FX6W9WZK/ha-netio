@@ -400,6 +400,14 @@ icon: mdi:television
 - Config flow UI with auto-detection of NETIO devices (DHCP via MAC prefix `24:A4:2C`)
 - Support for all current and obsolete NETIO products with JSON API
 
+## 1.10.0
+- **Quality scale: silver**
+  - Full test suite: 98 tests, 100% coverage across all ten modules (HTTP API client, all four config flows incl. DHCP/reauth/reconfigure, coordinator, all platforms), enforced at 95% in a new CI job
+  - `PARALLEL_UPDATES` declared on all platforms
+  - `data_description` texts for all form fields (en/de)
+  - README documents installation parameters and removal
+- **Fix**: renaming the NETIO device now also refreshes the names of its outlet sub-devices (they embed the device name as prefix)
+
 ## License
 
 MIT

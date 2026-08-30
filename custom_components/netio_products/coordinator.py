@@ -122,7 +122,8 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
         dev_reg = dr.async_get(self.hass)
 
         # Update parent device name
-        if device_name != self._last_device_name:
+        device_renamed = device_name != self._last_device_name
+        if device_renamed:
             device = dev_reg.async_get_device_by_identifier(
                 (DOMAIN, serial), self.config_entry.entry_id
             )
@@ -131,9 +132,10 @@ class NetioCoordinator(DataUpdateCoordinator[NetioDeviceState]):
                 _LOGGER.debug("Updated device name: %s", device_name)
             self._last_device_name = device_name
 
-        # Update sub-device names (per outlet)
+        # Update sub-device names (per outlet). Sub-device names embed the
+        # device name as prefix, so a device rename must refresh them too.
         for output_id, output_name in current_output_names.items():
-            if output_name != self._last_output_names.get(output_id):
+            if device_renamed or output_name != self._last_output_names.get(output_id):
                 full_name = f"{device_name} {output_name}"
                 sub_device = dev_reg.async_get_device_by_identifier(
                     (DOMAIN, f"{serial}_output_{output_id}"),

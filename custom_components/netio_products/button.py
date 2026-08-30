@@ -29,6 +29,9 @@ from .entity import NetioOutputEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+# Writes go through async_set_updated_data; reads come from the coordinator.
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: HomeAssistant,

@@ -10,6 +10,13 @@
           "username": "Benutzername",
           "password": "Passwort",
           "use_ssl": "HTTPS verwenden"
+        },
+        "data_description": {
+          "host": "IP-Adresse oder Hostname des NETIO-Geräts.",
+          "port": "Port der JSON-API (Standard 80, siehe Geräte-Webkonfiguration).",
+          "username": "Auf dem Gerät konfigurierter JSON-API-Benutzername.",
+          "password": "Auf dem Gerät konfiguriertes JSON-API-Passwort.",
+          "use_ssl": "Verbindung über HTTPS. NETIO-Geräte nutzen selbstsignierte Zertifikate, die Zertifikatsprüfung entfällt daher."
         }
       },
       "dhcp_confirm": {
@@ -20,6 +27,12 @@
           "username": "Benutzername",
           "password": "Passwort",
           "use_ssl": "HTTPS verwenden"
+        },
+        "data_description": {
+          "port": "Port der JSON-API (Standard 80, siehe Geräte-Webkonfiguration).",
+          "username": "Auf dem Gerät konfigurierter JSON-API-Benutzername.",
+          "password": "Auf dem Gerät konfiguriertes JSON-API-Passwort.",
+          "use_ssl": "Verbindung über HTTPS. NETIO-Geräte nutzen selbstsignierte Zertifikate, die Zertifikatsprüfung entfällt daher."
         }
       },
       "reconfigure": {
@@ -31,6 +44,13 @@
           "username": "Benutzername",
           "password": "Passwort",
           "use_ssl": "HTTPS verwenden"
+        },
+        "data_description": {
+          "host": "IP-Adresse oder Hostname des NETIO-Geräts.",
+          "port": "Port der JSON-API (Standard 80, siehe Geräte-Webkonfiguration).",
+          "username": "Auf dem Gerät konfigurierter JSON-API-Benutzername.",
+          "password": "Auf dem Gerät konfiguriertes JSON-API-Passwort.",
+          "use_ssl": "Verbindung über HTTPS. NETIO-Geräte nutzen selbstsignierte Zertifikate, die Zertifikatsprüfung entfällt daher."
         }
       },
       "buttons": {
@@ -40,6 +60,11 @@
           "enable_restart": "Neustart (Short OFF)",
           "enable_short_on": "Kurz Ein (Short ON)",
           "enable_toggle": "Umschalten (Toggle)"
+        },
+        "data_description": {
+          "enable_restart": "Pro Ausgang eine Neustart-Button-Entität anlegen.",
+          "enable_short_on": "Pro Ausgang eine Kurz-EIN-Button-Entität anlegen.",
+          "enable_toggle": "Pro Ausgang eine Umschalt-Button-Entität anlegen."
         }
       },
       "reauth_confirm": {
@@ -48,6 +73,10 @@
         "data": {
           "username": "Benutzername",
           "password": "Passwort"
+        },
+        "data_description": {
+          "username": "Auf dem Gerät konfigurierter JSON-API-Benutzername.",
+          "password": "Auf dem Gerät konfiguriertes JSON-API-Passwort."
         }
       }
     },
