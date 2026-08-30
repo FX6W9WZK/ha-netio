@@ -1,6 +1,7 @@
 # NETIO for Home Assistant
 
 [![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
+[![Quality Scale](https://img.shields.io/badge/Quality_Scale-Silver-c0c0c0.svg)](https://developers.home-assistant.io/docs/core/integration-quality-scale/)
 [![Validate](https://github.com/FX6W9WZK/ha-netio/actions/workflows/validate.yaml/badge.svg)](https://github.com/FX6W9WZK/ha-netio/actions/workflows/validate.yaml)
 [![GitHub Release](https://img.shields.io/github/v/release/FX6W9WZK/ha-netio)](https://github.com/FX6W9WZK/ha-netio/releases)
 [![Built with Claude AI](https://img.shields.io/badge/Built_with-Claude_AI-D4A27F?logo=anthropic&logoColor=white)](https://www.anthropic.com/claude)
