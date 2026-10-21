@@ -400,6 +400,12 @@ icon: mdi:television
 - Config flow UI with auto-detection of NETIO devices (DHCP via MAC prefix `24:A4:2C`)
 - Support for all current and obsolete NETIO products with JSON API
 
+## 1.10.1
+- Verified against HA 2026.10.2 (all 98 tests green)
+- Build the outlet sub-device info in one constructor call instead of mutating it, preparing for the HA 2026.11 DeviceInfo dataclass change
+- Declare the new manifest `categories` key (`plugs_switches`, `energy.meters_monitoring`)
+- Drop the redundant `reauth_successful` abort string (centrally translated since HA 2026.10)
+
 ## 1.10.0
 - **Quality scale: silver**
   - Full test suite: 98 tests, 100% coverage across all ten modules (HTTP API client, all four config flows incl. DHCP/reauth/reconfigure, coordinator, all platforms), enforced at 95% in a new CI job

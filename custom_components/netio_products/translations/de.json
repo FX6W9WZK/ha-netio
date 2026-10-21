@@ -87,7 +87,6 @@
     },
     "abort": {
       "already_configured": "Dieses Gerät ist bereits eingerichtet.",
-      "reauth_successful": "Erneute Authentifizierung erfolgreich",
       "wrong_device": "Dies ist ein anderes Gerät als das ursprünglich konfigurierte"
     }
   },

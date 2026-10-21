@@ -71,13 +71,16 @@ class NetioOutputEntity(CoordinatorEntity[NetioCoordinator]):
 
         device_name = agent.device_name or agent.model or "NETIO Device"
 
-        device_info = DeviceInfo(
+        # DeviceInfo becomes a dataclass in HA 2026.11 — build it in one go
+        # instead of mutating it afterwards.
+        link: dict = {}
+        if coordinator.parent_device_id is not None:
+            link["via_device_id"] = coordinator.parent_device_id
+        self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{serial}_output_{output_id}")},
             name=f"{device_name} {output_name}",
             manufacturer="NETIO products a.s.",
             model=agent.model,
             sw_version=agent.version,
+            **link,
         )
-        if coordinator.parent_device_id is not None:
-            device_info["via_device_id"] = coordinator.parent_device_id
-        self._attr_device_info = device_info

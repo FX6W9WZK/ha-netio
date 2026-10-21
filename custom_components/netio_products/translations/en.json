@@ -87,7 +87,6 @@
     },
     "abort": {
       "already_configured": "This device is already configured.",
-      "reauth_successful": "Re-authentication was successful",
       "wrong_device": "This is a different device than the one originally configured"
     }
   },
