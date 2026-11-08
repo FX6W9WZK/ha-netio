@@ -400,6 +400,10 @@ icon: mdi:television
 - Config flow UI with auto-detection of NETIO devices (DHCP via MAC prefix `24:A4:2C`)
 - Support for all current and obsolete NETIO products with JSON API
 
+## 1.10.2
+- Marketplace release: README updated for the built-in Home Assistant Marketplace (replaces HACS since HA 2026.11), manifest `categories` key added
+- Verified against HA 2026.11.0 (full test suite green) — no functional changes
+
 ## 1.10.1
 - Verified against HA 2026.10.2 (all 98 tests green)
 - Build the outlet sub-device info in one constructor call instead of mutating it, preparing for the HA 2026.11 DeviceInfo dataclass change
