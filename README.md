@@ -1,12 +1,12 @@
 # NETIO for Home Assistant
 
-[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
+[![Marketplace](https://img.shields.io/badge/HA_Marketplace-Catalog-41BDF5.svg)](https://www.home-assistant.io/integrations/marketplace/)
 [![Quality Scale](https://img.shields.io/badge/Quality_Scale-Silver-c0c0c0.svg)](https://developers.home-assistant.io/docs/core/integration-quality-scale/)
 [![Validate](https://github.com/FX6W9WZK/ha-netio/actions/workflows/validate.yaml/badge.svg)](https://github.com/FX6W9WZK/ha-netio/actions/workflows/validate.yaml)
 [![GitHub Release](https://img.shields.io/github/v/release/FX6W9WZK/ha-netio)](https://github.com/FX6W9WZK/ha-netio/releases)
 [![Built with Claude AI](https://img.shields.io/badge/Built_with-Claude_AI-D4A27F?logo=anthropic&logoColor=white)](https://www.anthropic.com/claude)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=FX6W9WZK&repository=ha-netio&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=FX6W9WZK&repository=ha-netio&category=integration)
 
 Home Assistant custom integration for [NETIO](https://www.netio-products.com/) networked power sockets and PDUs.
 
@@ -51,11 +51,11 @@ The integration auto-detects metering support from the device's JSON API respons
 
 ## Installation
 
-### HACS (recommended)
+### Marketplace (recommended)
 
-NETIO is part of the HACS default repository list:
+NETIO is part of the Marketplace catalog (Home Assistant 2026.11+; on older versions use HACS):
 
-1. Open HACS in Home Assistant
+1. Open **Settings → Marketplace** in Home Assistant
 2. Search for "NETIO" and install
 3. Restart Home Assistant
 
@@ -361,4 +361,4 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 2. Open the three-dot menu of the config entry and choose **Delete**
 3. Restart Home Assistant
 
-All devices and entities are removed automatically. To also remove the files, uninstall the integration in HACS afterwards.
+All devices and entities are removed automatically. To also remove the files, uninstall the repository in the Marketplace afterwards.

@@ -4,6 +4,10 @@
   "after_dependencies": [
     "http"
   ],
+  "categories": [
+    "plugs_switches",
+    "energy.meters_monitoring"
+  ],
   "codeowners": [
     "@FX6W9WZK"
   ],
