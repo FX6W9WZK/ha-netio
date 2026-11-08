@@ -6,7 +6,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/FX6W9WZK/ha-netio)](https://github.com/FX6W9WZK/ha-netio/releases)
 [![Built with Claude AI](https://img.shields.io/badge/Built_with-Claude_AI-D4A27F?logo=anthropic&logoColor=white)](https://www.anthropic.com/claude)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=FX6W9WZK&repository=ha-netio&category=integration)
+[![Open your Home Assistant instance and show this repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=FX6W9WZK&repository=ha-netio&category=integration)
 
 Home Assistant custom integration for [NETIO](https://www.netio-products.com/) networked power sockets and PDUs.
 
