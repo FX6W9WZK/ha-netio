@@ -53,7 +53,7 @@ The integration auto-detects metering support from the device's JSON API respons
 
 ### Marketplace (recommended)
 
-NETIO is part of the Marketplace catalog (Home Assistant 2026.11+; on older versions use HACS):
+NETIO is part of the Marketplace catalog (Home Assistant 2026.11+):
 
 1. Open **Settings → Marketplace** in Home Assistant
 2. Search for "NETIO" and install
